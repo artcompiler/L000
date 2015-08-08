@@ -1,0 +1,29 @@
+{
+  "name": "L000",
+  "version": "0.0.0",
+  "description": "Compiler as a service.",
+  "author": "Art Compiler LLC",
+  "main": "index.js",
+  "scripts": {
+    "start": "node --harmony index.js",
+    "test": "make test"
+  },
+  "dependencies": {
+    "express": "^4.0.x",
+    "domready": "^1.0.8"
+  },
+  "engines": {
+    "npm": "latest",
+    "node": "latest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/artcompiler/L000"
+  },
+  "devDependencies": {
+    "babelify": "^6.1.3",
+    "browserify": "^11.0.1",
+    "gulp": "^3.9.0",
+    "vinyl-source-stream": "^1.1.0"
+  }
+}
