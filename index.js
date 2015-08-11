@@ -29,7 +29,9 @@ app.get('/compile', function(req, res) {
           error: err
         });
       } else {
-        res.send(val);
+        res.send({
+          data: val
+        });
       }
     });
   });

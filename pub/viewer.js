@@ -3,9 +3,15 @@
 /* Copyright (c) 2015, Jeff Dyer, Art Compiler LLC */
 window.exports.viewer = (function () {
   function update(el, obj, src, pool) {
+    obj = JSON.parse(obj);
+    if (obj.error) {
+      str = "ERROR: " + obj.error;
+    } else {
+      str = obj.data;
+    }
     var text =
       "<text x='4' y='20'>" +
-      "<tspan font-size='14' font-weight='600'>" + obj + "</tspan> " +
+      "<tspan font-size='14' font-weight='600'>" + str + "</tspan> " +
       "</text>";
     $(el).html('<g>' + text + '</g>');
     var bbox = $("#graff-view svg g")[0].getBBox();

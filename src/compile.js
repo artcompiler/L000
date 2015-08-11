@@ -47,6 +47,19 @@ let translate = function() {
     let val = node.elts[0];
     resume(null, val);
   }
+  function add(node, options, resume) {
+    visit(node.elts[0], options, function (err, v1) {
+      visit(node.elts[1], options, function (err, v2) {
+        let val = +v1 + +v2;
+        if (isNaN(val)) {
+          console.log("add() val=" + val);
+          resume("NaN", null);
+        } else {
+          resume(null, val);
+        }
+      });
+    });
+  };
   function list(node, options, resume) {
     visit(node.elts[0], options, function (err, val) {
       if (!(val instanceof Array)) {
@@ -66,8 +79,8 @@ let translate = function() {
       visit(node.elts[0], options, function (err, val) {
         node.elts.shift();
         exprs(node, options, function (err, data) {
-          data.push(val);
-          resume(null, data);
+          data.unshift(val);
+          resume(err, data);
         });
       });
     } else {
@@ -82,6 +95,7 @@ let translate = function() {
     "IDENT": ident,
     "BOOL": bool,
     "LIST" : list,
+    "ADD" : add,
   }
   return translate;
 }();
@@ -113,7 +127,7 @@ export let compiler = function () {
           resume(err, data);
         } else {
           render(data, function (err, data) {
-            console.log("render data=" + JSON.stringify(data, null, 2));
+            console.log("render err=" + err + " data=" + JSON.stringify(data, null, 2));
             resume(err, data);
           });
         }
