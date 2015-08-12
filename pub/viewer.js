@@ -18,6 +18,14 @@ window.exports.viewer = (function () {
     $(el).attr("height", (bbox.height + 20) + "px");
     $(el).attr("width", (bbox.width + 40) + "px");
   }
+  function render() {
+    var rp1 = radialProgress(el)
+      .label("RADIAL 1")
+      .onClick(onClick1)
+      .diameter(150)
+      .value(78)
+      .render();
+  }
   function capture(el) {
     var mySVG = $(el).html();
     return mySVG;
