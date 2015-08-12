@@ -15,8 +15,8 @@ window.exports.viewer = (function () {
       "</text>";
     $(el).html('<g>' + text + '</g>');
     var bbox = $("#graff-view svg g")[0].getBBox();
-    $(el).attr("height", (bbox.height + 20) + "px");
-    $(el).attr("width", (bbox.width + 40) + "px");
+    $(el).attr("height", (bbox.height + 12) + "px");
+    $(el).attr("width", (bbox.width + 10) + "px");
   }
   function capture(el) {
     var mySVG = $(el).html();
