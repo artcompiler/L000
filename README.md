@@ -1,6 +1,6 @@
-### Making an Art Compiler
+## Making an Art Compiler
 
-# Steps include:
+### Steps include
 
 * Clone this repo which contains a prototypical art compiler into a renamed repo (e.g. L201).
 * Clone the GC repo (https://github.com/artcompiler/graffiticode).
@@ -16,7 +16,7 @@
 * Push your latest changes.
 * Go to the live GC server (e.g. http://graffiticode.com/l201) and play with your language.
 
-# Write about it
+### Write about it
 
 * Document issues by creating bugs in this repo.
 * Edit this readme file to expand on these instructions
