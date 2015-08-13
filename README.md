@@ -4,6 +4,7 @@
 
 * Clone this repo which contains a prototypical art compiler into a renamed repo (e.g. L201).
 * Clone the GC repo (https://github.com/artcompiler/graffiticode).
+* Populate the postgres database (e.g. 'pgsql < dev/init_data.dump').
 * Design a language that allows you to say things that are interesting and beatiful.
 * Edit ./pub/lexicon.js to define a vocabulary for that language.
 * Edit ./src/compiler.js to translate the ASTs produced from GC into object code that expresses the output of that language.
