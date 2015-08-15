@@ -20,6 +20,12 @@ let translate = function() {
     nodePool = pool;
     return visit(pool.root, {}, resume);
   }
+  function error(str, nid) {
+    return {
+      str: str,
+      nid: nid,
+    };
+  }
   function visit(nid, options, resume) {
     assert(typeof resume === "function", message(1003));
     // Get the node from the pool of nodes.
@@ -33,30 +39,33 @@ let translate = function() {
   let edgesNode;
   function str(node, options, resume) {
     let val = node.elts[0];
-    resume(null, val);
+    resume([], val);
   }
   function num(node, options, resume) {
     let val = node.elts[0];
-    resume(null, val);
+    resume([], val);
   }
   function ident(node, options, resume) {
     let val = node.elts[0];
-    resume(null, val);
+    resume([], val);
   }
   function bool(node, options, resume) {
     let val = node.elts[0];
-    resume(null, val);
+    resume([], val);
   }
   function add(node, options, resume) {
-    visit(node.elts[0], options, function (err, v1) {
-      visit(node.elts[1], options, function (err, v2) {
-        let val = +v1 + +v2;
-        if (isNaN(val)) {
-          console.log("add() val=" + val);
-          resume("NaN", null);
-        } else {
-          resume(null, val);
+    let err = [];
+    visit(node.elts[0], options, function (err1, val1) {
+      val1 = +val1;
+      if (isNaN(val1)) {
+        err1 = err1.concat(error("Argument must be a number.", node.elts[0]));
+      }
+      visit(node.elts[1], options, function (err2, val2) {
+        val2 = +val2;
+        if (isNaN(val2)) {
+          err2 = err2.concat(error("Argument must be a number.", node.elts[1]));
         }
+        resume(err.concat(err1).concat(err2), val1 + val2);
       });
     });
   };
@@ -84,7 +93,7 @@ let translate = function() {
         });
       });
     } else {
-      resume(null, []);
+      resume([], []);
     }
   };
   let table = {
@@ -123,7 +132,7 @@ export let compiler = function () {
     try {
       translate(pool, function (err, data) {
         console.log("translate data=" + JSON.stringify(data, null, 2));
-        if (err) {
+        if (err.length) {
           resume(err, data);
         } else {
           render(data, function (err, data) {
