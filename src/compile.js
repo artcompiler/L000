@@ -10,13 +10,10 @@ messages[1002] = "Invalid tag in node with Node ID %1.";
 messages[1003] = "No aync callback provided.";
 messages[1004] = "No visitor method defined for '%1'.";
 
-let translate = function() {
-  function print(str) {
-    console.log(str);
-  }
+let translate = (function() {
   let nodePool;
   function translate(pool, resume) {
-    print("pool=" + JSON.stringify(pool, null, 2));
+    console.log("pool=" + JSON.stringify(pool, null, 2));
     nodePool = pool;
     return visit(pool.root, {}, resume);
   }
@@ -54,7 +51,6 @@ let translate = function() {
     resume([], val);
   }
   function add(node, options, resume) {
-    let err = [];
     visit(node.elts[0], options, function (err1, val1) {
       val1 = +val1;
       if (isNaN(val1)) {
@@ -65,7 +61,7 @@ let translate = function() {
         if (isNaN(val2)) {
           err2 = err2.concat(error("Argument must be a number.", node.elts[1]));
         }
-        resume(err.concat(err1).concat(err2), val1 + val2);
+        resume([].concat(err1).concat(err2), val1 + val2);
       });
     });
   };
@@ -85,11 +81,11 @@ let translate = function() {
   }
   function exprs(node, options, resume) {
     if (node.elts && node.elts.length) {
-      visit(node.elts[0], options, function (err, val) {
+      visit(node.elts[0], options, function (err1, val1) {
         node.elts.shift();
-        exprs(node, options, function (err, data) {
-          data.unshift(val);
-          resume(err, data);
+        exprs(node, options, function (err2, val2) {
+          val2.unshift(val1);
+          resume([].concat(err1).concat(err2), val2);
         });
       });
     } else {
@@ -107,9 +103,9 @@ let translate = function() {
     "ADD" : add,
   }
   return translate;
-}();
+})();
 
-let render = function() {
+let render = (function() {
   function escapeXML(str) {
     return String(str)
       .replace(/&(?!\w+;)/g, "&amp;")
@@ -119,25 +115,26 @@ let render = function() {
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
   }
-  function render(node, resume) {
-    resume(null, node);
+  function render(val, resume) {
+    // Do some rendering here.
+    resume([], val);
   }
   return render;
-}();
+})();
 
-export let compiler = function () {
+export let compiler = (function () {
   exports.compile = function compile(pool, resume) {
     // Compiler takes an AST in the form of a node pool and translates it into
     // an object to be rendered on the client by the viewer for this language.
     try {
-      translate(pool, function (err, data) {
-        console.log("translate data=" + JSON.stringify(data, null, 2));
+      translate(pool, function (err, val) {
+        console.log("translate err=" + JSON.stringify(err, null, 2) + "\nval=" + JSON.stringify(val, null, 2));
         if (err.length) {
-          resume(err, data);
+          resume(err, val);
         } else {
-          render(data, function (err, data) {
-            console.log("render err=" + err + " data=" + JSON.stringify(data, null, 2));
-            resume(err, data);
+          render(val, function (err, val) {
+            console.log("render err=" + JSON.stringify(err, null, 2) + "\nval=" + JSON.stringify(val, null, 2));
+            resume(err, val);
           });
         }
       });
@@ -149,4 +146,4 @@ export let compiler = function () {
       });
     }
   }
-}();
+})();
