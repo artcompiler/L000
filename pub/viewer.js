@@ -3,6 +3,7 @@
 /* Copyright (c) 2015, Jeff Dyer, Art Compiler LLC */
 window.exports.viewer = (function () {
   function update(el, obj, src, pool) {
+    obj = JSON.parse(obj);
     if (obj.error && obj.error.length > 0) {
       str = "ERROR";
     } else {
