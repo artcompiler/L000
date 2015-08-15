@@ -104,7 +104,6 @@ let translate = (function() {
   }
   return translate;
 })();
-
 let render = (function() {
   function escapeXML(str) {
     return String(str)
