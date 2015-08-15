@@ -121,7 +121,6 @@ let render = (function() {
   }
   return render;
 })();
-
 export let compiler = (function () {
   exports.compile = function compile(pool, resume) {
     // Compiler takes an AST in the form of a node pool and translates it into
