@@ -9,4 +9,5 @@ exports.globalLexicon = {
     "true" : { "tk": 0x14, "cls": "val", "length": 0 },
     "false" : { "tk": 0x14, "cls": "val", "length": 0 },
     "add" : { "tk": 0x01, "name": "ADD", "cls": "function", "length": 2 , "arity": 2 },    
+    "style" : { "tk": 0x01, "name": "STYLE", "cls": "function", "length": 2, "arity": 2 },    
 }

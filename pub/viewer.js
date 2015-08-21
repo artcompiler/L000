@@ -4,15 +4,33 @@
 window.exports.viewer = (function () {
   function update(el, obj, src, pool) {
     obj = JSON.parse(obj);
+    var str;
     if (obj.error && obj.error.length > 0) {
       str = "ERROR";
     } else {
-      str = obj.data;
+      data = obj.data;
     }
-    var text =
-      "<text x='4' y='20'>" +
-      "<tspan font-size='14' font-weight='600'>" + str + "</tspan> " +
-      "</text>";
+    var textSpan = "";
+    var style = ""
+    var height = 24;
+    obj.data.forEach(function (data) {
+      style = "";
+      if (typeof data === "string") {
+        str = data[0];
+      } else {
+        str = data.value;
+        if (data.style) {
+          data.style.forEach(function (p) {
+            style += p.key + ":" + p.val + ";";
+            if (p.key === "font-size") {
+              height = p.val;
+            }
+          });
+        }
+      }
+      textSpan += "<tspan style='" + style + "'>" + str + "</tspan> ";
+    });
+    var text = "<text x='4' y='" + height + "'>" + textSpan + "</text>";
     $(el).html('<g>' + text + '</g>');
     var bbox = $("#graff-view svg g")[0].getBBox();
     $(el).attr("height", (bbox.height + 12) + "px");
