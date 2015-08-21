@@ -66,19 +66,38 @@ let translate = (function() {
     });
   };
   function list(node, options, resume) {
-    visit(node.elts[0], options, function (err, val) {
-      if (!(val instanceof Array)) {
-        val = [val];
-      }
-      resume(null, val);
-    });
-  }
-  function program(node, options, resume) {
-    if (!options) {
-      options = {};
+    if (node.elts && node.elts.length) {
+      visit(node.elts[0], options, function (err1, val1) {
+        node.elts.shift();
+        list(node, options, function (err2, val2) {
+          val2.unshift(val1);
+          resume([].concat(err1).concat(err2), val2);
+        });
+      });
+    } else {
+      resume([], []);
     }
-    visit(node.elts[0], options, resume);
-  }
+  };
+  function binding(node, options, resume) {
+    visit(node.elts[0], options, function (err1, val1) {
+      visit(node.elts[1], options, function (err2, val2) {
+        resume([].concat(err1).concat(err2), {key: val1, val: val2});
+      });
+    });
+  };
+  function record(node, options, resume) {
+    if (node.elts && node.elts.length) {
+      visit(node.elts[0], options, function (err1, val1) {
+        node.elts.shift();
+        record(node, options, function (err2, val2) {
+          val2.unshift(val1);
+          resume([].concat(err1).concat(err2), val2);
+        });
+      });
+    } else {
+      resume([], []);
+    }
+  };
   function exprs(node, options, resume) {
     if (node.elts && node.elts.length) {
       visit(node.elts[0], options, function (err1, val1) {
@@ -92,6 +111,12 @@ let translate = (function() {
       resume([], []);
     }
   };
+  function program(node, options, resume) {
+    if (!options) {
+      options = {};
+    }
+    visit(node.elts[0], options, resume);
+  }
   let table = {
     "PROG" : program,
     "EXPRS" : exprs,
@@ -99,7 +124,9 @@ let translate = (function() {
     "NUM": num,
     "IDENT": ident,
     "BOOL": bool,
-    "LIST" : list,
+    "LIST": list,
+    "RECORD": record,
+    "BINDING": binding,
     "ADD" : add,
   }
   return translate;
