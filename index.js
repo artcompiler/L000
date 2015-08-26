@@ -3,7 +3,6 @@
 /*
    L000 compiler service.
 */
-var _ = require('underscore');
 var fs = require('fs');
 var http = require('http');
 var express = require('express')
@@ -13,12 +12,6 @@ app.set('views', __dirname);
 app.use(express.static(__dirname + '/pub'));
 app.get('/', function(req, res) {
   res.send("Hello, L000!");
-});
-app.engine('html', function (templateFile, options, callback) {
-  fs.readFile(templateFile, function (err, templateData) {
-    var template = _.template(String(templateData));
-    callback(err, template(options))
-  });
 });
 
 
