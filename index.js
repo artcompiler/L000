@@ -3,14 +3,25 @@
 /*
    L000 compiler service.
 */
+var _ = require('underscore');
+var fs = require('fs');
 var http = require('http');
 var express = require('express')
 var app = express();
 app.set('port', (process.env.PORT || 5000));
+app.set('views', __dirname);
 app.use(express.static(__dirname + '/pub'));
 app.get('/', function(req, res) {
   res.send("Hello, L000!");
 });
+app.engine('html', function (templateFile, options, callback) {
+  fs.readFile(templateFile, function (err, templateData) {
+    var template = _.template(String(templateData));
+    callback(err, template(options))
+  });
+});
+
+
 var compiler = require("./lib/compile.js");
 // Graffiti Code will load the version of itself that matches the graffiti
 // version. The compiler should use a version of itself that is compatible
@@ -47,6 +58,53 @@ app.get('/compile', function(req, res) {
     console.log(e);
     res.send(e);
   });
+});
+app.get('/view/:id', function(req, res) {
+  var id = req.params.id;
+  item(id, function (err, data) {
+    var obj = JSON.parse(data)[0].obj;
+    res.render('view.html', {
+      obj: JSON.stringify(obj),
+    }, function (error, html) {
+      if (error) {
+        console.log("error=" + error.stack);
+        res.send(400, error);
+      } else {
+        console.log("html=" + html);
+        res.send(html);
+      }
+    });
+/*
+    if (err && err.length) {
+      res.send({
+        error: err,
+      });
+    } else {
+      res.send(obj);
+    }
+*/
+  });
+  function item(id, resume) {
+    var options = {
+      method: "GET",
+      host: "www.graffiticode.com",
+      path: "/code/" + id,
+    };
+    var req = http.get(options, function(res) {
+      var data = "";
+      res.on('data', function (chunk) {
+        data += chunk;
+      }).on('end', function () {
+        try {
+          resume(null, data);
+        } catch (e) {
+          console.log("ERROR: " + e.stack);
+        }
+      }).on("error", function () {
+        resume("ERROR status=" + res.statusCode + " data=" + data, null);
+      });
+    });
+  }
 });
 app.listen(app.get('port'), function() {
   console.log("Node app is running at localhost:" + app.get('port'))

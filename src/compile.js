@@ -29,7 +29,7 @@ let translate = (function() {
     let node = nodePool[nid];
     assert(node, message(1001, [nid]));
     assert(node.tag, message(1001, [nid]));
-    assert(typeof table[node.tag] === "function", message(1004, [node.tag]));
+    assert(typeof table[node.tag] === "function", message(1004, [JSON.stringify(node.tag)]));
     return table[node.tag](node, options, resume);
   }
   // BEGIN VISITOR METHODS
