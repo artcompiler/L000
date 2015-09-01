@@ -7,26 +7,23 @@ window.exports.viewer = (function () {
     var str;
     if (obj.error && obj.error.length > 0) {
       str = "ERROR";
+      data = [];
     } else {
       data = obj.data;
     }
     var textSpan = "";
     var style = ""
     var height = 24;
-    obj.data.forEach(function (data) {
+    data.forEach(function (data) {
       style = "";
-      if (typeof data === "string") {
-        str = data[0];
-      } else {
-        str = data.value;
-        if (data.style) {
-          data.style.forEach(function (p) {
-            style += p.key + ":" + p.val + ";";
-            if (p.key === "font-size") {
-              height = p.val;
-            }
-          });
-        }
+      str = data.value;
+      if (data.style) {
+        data.style.forEach(function (p) {
+          style += p.key[0] + ":" + p.val.value + ";";
+          if (p.key === "font-size") {
+            height = p.val;
+          }
+        });
       }
       textSpan += "<tspan style='" + style + "'>" + str + "</tspan> ";
     });

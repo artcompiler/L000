@@ -26,7 +26,12 @@ let translate = (function() {
   function visit(nid, options, resume) {
     assert(typeof resume === "function", message(1003));
     // Get the node from the pool of nodes.
-    let node = nodePool[nid];
+    let node;
+    if (typeof nid === "object") {
+      node = nid;
+    } else {
+      node = nodePool[nid];
+    }
     assert(node, message(1001, [nid]));
     assert(node.tag, message(1001, [nid]));
     assert(typeof table[node.tag] === "function", message(1004, [JSON.stringify(node.tag)]));
@@ -36,28 +41,32 @@ let translate = (function() {
   let edgesNode;
   function str(node, options, resume) {
     let val = node.elts[0];
-    resume([], val);
+    resume([], {
+      value: val
+    });
   }
   function num(node, options, resume) {
     let val = node.elts[0];
-    resume([], val);
+    resume([], {
+      value: val
+    });
   }
   function ident(node, options, resume) {
     let val = node.elts[0];
-    resume([], val);
+    resume([], [val]);
   }
   function bool(node, options, resume) {
     let val = node.elts[0];
-    resume([], val);
+    resume([], [val]);
   }
   function add(node, options, resume) {
     visit(node.elts[0], options, function (err1, val1) {
-      val1 = +val1;
+      val1 = +val1.value;
       if (isNaN(val1)) {
         err1 = err1.concat(error("Argument must be a number.", node.elts[0]));
       }
       visit(node.elts[1], options, function (err2, val2) {
-        val2 = +val2;
+        val2 = +val2.value;
         if (isNaN(val2)) {
           err2 = err2.concat(error("Argument must be a number.", node.elts[1]));
         }
@@ -69,7 +78,7 @@ let translate = (function() {
     visit(node.elts[0], options, function (err1, val1) {
       visit(node.elts[1], options, function (err2, val2) {
         resume([].concat(err1).concat(err2), {
-          value: val1,
+          value: val1.value,
           style: val2,
         });
       });
@@ -80,8 +89,7 @@ let translate = (function() {
       visit(node.elts[0], options, function (err1, val1) {
         node.elts.shift();
         list(node, options, function (err2, val2) {
-          val2.unshift(val1);
-          resume([].concat(err1).concat(err2), val2);
+          resume([].concat(err1).concat(err2), val2.concat(val1));
         });
       });
     } else {
@@ -109,13 +117,16 @@ let translate = (function() {
     }
   };
   function exprs(node, options, resume) {
-    if (node.elts && node.elts.length) {
+    if (node.elts && node.elts.length > 1) {
       visit(node.elts[0], options, function (err1, val1) {
         node.elts.shift();
         exprs(node, options, function (err2, val2) {
-          val2.unshift(val1);
-          resume([].concat(err1).concat(err2), val2);
+          resume([].concat(err1).concat(err2), [].concat(val1).concat(val2));
         });
+      });
+    } else if (node.elts && node.elts.length > 0) {
+      visit(node.elts[0], options, function (err1, val1) {
+        resume([].concat(err1), [].concat(val1));
       });
     } else {
       resume([], []);
@@ -125,7 +136,9 @@ let translate = (function() {
     if (!options) {
       options = {};
     }
-    visit(node.elts[0], options, resume);
+    visit(node.elts[0], options, function (err, val) {
+      resume(err, val);
+    });
   }
   let table = {
     "PROG" : program,
