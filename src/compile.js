@@ -77,20 +77,25 @@ let translate = (function() {
   function style(node, options, resume) {
     visit(node.elts[0], options, function (err1, val1) {
       visit(node.elts[1], options, function (err2, val2) {
+        console.log("style() val1=" + JSON.stringify(val1));
         resume([].concat(err1).concat(err2), {
-          value: val1.value,
+          value: val1,
           style: val2,
         });
       });
     });
   };
   function list(node, options, resume) {
-    if (node.elts && node.elts.length) {
+    if (node.elts && node.elts.length > 1) {
       visit(node.elts[0], options, function (err1, val1) {
         node.elts.shift();
         list(node, options, function (err2, val2) {
-          resume([].concat(err1).concat(err2), val2.concat(val1));
+          resume([].concat(err1).concat(err2), [].concat(val1).concat(val2));
         });
+      });
+    } else if (node.elts && node.elts.length === 0) {
+      visit(node.elts[0], options, function (err1, val1) {
+        resume([].concat(err1), [].concat(val1));
       });
     } else {
       resume([], []);
@@ -104,13 +109,16 @@ let translate = (function() {
     });
   };
   function record(node, options, resume) {
-    if (node.elts && node.elts.length) {
+    if (node.elts && node.elts.length > 1) {
       visit(node.elts[0], options, function (err1, val1) {
         node.elts.shift();
         record(node, options, function (err2, val2) {
-          val2.unshift(val1);
-          resume([].concat(err1).concat(err2), val2);
+          resume([].concat(err1).concat(err2), [].concat(val1).concat(val2));
         });
+      });
+    } else if (node.elts && node.elts.length > 0) {
+      visit(node.elts[0], options, function (err1, val1) {
+        resume([].concat(err1), [].concat(val1));
       });
     } else {
       resume([], []);

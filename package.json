@@ -20,6 +20,7 @@
     "url": "https://github.com/artcompiler/L000"
   },
   "devDependencies": {
-    "babel": "^5.8.21"
+    "babel": "^5.8.21",
+    "browserify": "latest"
   }
 }
