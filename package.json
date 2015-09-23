@@ -9,7 +9,8 @@
   },
   "dependencies": {
     "express": "^4.0.x",
-    "domready": "^1.0.8"
+    "domready": "^1.0.8",
+    "topojson": "latest"
   },
   "engines": {
     "npm": "latest",
