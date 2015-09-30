@@ -697,7 +697,6 @@ var topojson = _interopRequireWildcard(_topojson);
 
 window.exports.viewer = (function () {
   function update(el, obj, src, pool) {
-    console.log("okay: " + topojson.mesh);
     var data = undefined;
     (0, _assert.assert)(obj, "No data found!");
     obj = JSON.parse(obj);
