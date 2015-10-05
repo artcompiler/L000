@@ -16,4 +16,5 @@ exports.globalLexicon = {
     // number values
     "ten" : { "tk": 0x01, "cls": "number", "val": "10", "length": 0 },
     "USA" : { "tk": 0x01, "cls": "number", "val": "10001", "length": 0 },
+    "_" : { "tk": 0x01, "cls": "number", "val": "0", "length": 0 },
 }
