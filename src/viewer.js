@@ -1,7 +1,6 @@
 /* -*- Mode: js; js-indent-level: 2; indent-tabs-mode: nil; tab-width: 2 -*- */
 /* vim: set shiftwidth=2 tabstop=2 autoindent cindent expandtab: */
 /* Copyright (c) 2015, Jeff Dyer, Art Compiler LLC */
-//import {d3} from "./d3.v3.js";
 import {assert, message, messages, reserveCodeRange} from "./assert";
 import * as React from "./react";
 window.exports.viewer = (function () {
