@@ -6017,7 +6017,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 /* -*- Mode: js; js-indent-level: 2; indent-tabs-mode: nil; tab-width: 2 -*- */
 /* vim: set shiftwidth=2 tabstop=2 autoindent cindent expandtab: */
-/* Copyright (c) 2015, Jeff Dyer, Art Compiler LLC */
+/* Copyright (c) 2015, Art Compiler LLC */
 
 window.exports.viewer = (function () {
   function capture(el) {
@@ -6027,30 +6027,17 @@ window.exports.viewer = (function () {
   var Timer = React.createClass({
     displayName: "Timer",
 
-    //    getInitialState: function() {
-    //      return {secondsElapsed: this.props.secondsElapsed ? this.props.secondsElapsed : 0};
-    //    },
     tick: function tick() {
-      if (this.props.secondsElapsed !== undefined) {
-        var state = { secondsElapsed: this.props.secondsElapsed + 1 };
-        //this.setState(state);
-        window.dispatcher.dispatch({
-          data: state
-        });
-      }
+      var secondsElapsed = this.props.secondsElapsed;
+      var state = {
+        secondsElapsed: (secondsElapsed ? secondsElapsed : 0) + 1
+      };
+      window.dispatcher.dispatch({
+        data: state
+      });
     },
-    componentDidUpdate: function componentDidUpdate() {},
     componentDidMount: function componentDidMount() {
       this.interval = setInterval(this.tick, 1000);
-      /*
-            let exports = window.exports;
-            let self = this;
-            if (exports.data) {
-              $.get("http://"+location.host+"/data?id=" + exports.data, function (data) {
-                self.setState(data);
-              });
-            }
-      */
     },
     componentWillUnmount: function componentWillUnmount() {
       clearInterval(this.interval);
@@ -6067,6 +6054,8 @@ window.exports.viewer = (function () {
     displayName: "Viewer",
 
     render: function render() {
+      // If you have nested components, make sure you send the props down to the
+      // owned components.
       var props = this.props;
       var data = props.data ? props.data : [];
       var elts = [];

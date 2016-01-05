@@ -10,18 +10,16 @@ window.exports.viewer = (function () {
   }
   var Timer = React.createClass({
     tick: function() {
-      if (this.props.secondsElapsed !== undefined) {
-        // We have a initial count, so increment.
-        let state = {secondsElapsed: this.props.secondsElapsed + 1};
-        // Dispatch state change. Change will be echoed back through updated
-        // props during rendering.
-        window.dispatcher.dispatch({
-          data: state,
-        });
-      }
+      let secondsElapsed = this.props.secondsElapsed;
+      let state = {
+        secondsElapsed: (secondsElapsed ? secondsElapsed : 0) + 5;
+      };
+      window.dispatcher.dispatch({
+        data: state,
+      });
     },
     componentDidMount: function() {
-      this.interval = setInterval(this.tick, 1000);
+      this.interval = setInterval(this.tick, 5000);
     },
     componentWillUnmount: function() {
       clearInterval(this.interval);
