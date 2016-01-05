@@ -6027,26 +6027,30 @@ window.exports.viewer = (function () {
   var Timer = React.createClass({
     displayName: "Timer",
 
-    getInitialState: function getInitialState() {
-      return { secondsElapsed: 0 };
-    },
+    //    getInitialState: function() {
+    //      return {secondsElapsed: this.props.secondsElapsed ? this.props.secondsElapsed : 0};
+    //    },
     tick: function tick() {
-      var state = { secondsElapsed: this.state.secondsElapsed + 1 };
-      this.setState(state);
-      window.dispatcher.dispatch({
-        data: state
-      });
+      if (this.props.secondsElapsed !== undefined) {
+        var state = { secondsElapsed: this.props.secondsElapsed + 1 };
+        //this.setState(state);
+        window.dispatcher.dispatch({
+          data: state
+        });
+      }
     },
     componentDidUpdate: function componentDidUpdate() {},
     componentDidMount: function componentDidMount() {
       this.interval = setInterval(this.tick, 1000);
-      var exports = window.exports;
-      var self = this;
-      if (exports.data) {
-        $.get("http://" + location.host + "/data?id=" + exports.data, function (data) {
-          self.setState(data);
-        });
-      }
+      /*
+            let exports = window.exports;
+            let self = this;
+            if (exports.data) {
+              $.get("http://"+location.host+"/data?id=" + exports.data, function (data) {
+                self.setState(data);
+              });
+            }
+      */
     },
     componentWillUnmount: function componentWillUnmount() {
       clearInterval(this.interval);
@@ -6055,7 +6059,7 @@ window.exports.viewer = (function () {
       return React.createElement(
         "div",
         null,
-        this.state.secondsElapsed
+        this.props.secondsElapsed
       );
     }
   });
@@ -6063,7 +6067,8 @@ window.exports.viewer = (function () {
     displayName: "Viewer",
 
     render: function render() {
-      var data = this.props.data ? this.props.data : [];
+      var props = this.props;
+      var data = props.data ? props.data : [];
       var elts = [];
       data.forEach(function (d, i) {
         var style = {};
@@ -6076,7 +6081,7 @@ window.exports.viewer = (function () {
           elts.push(React.createElement(
             "span",
             { key: i, style: style },
-            React.createElement(Timer, null)
+            React.createElement(Timer, props)
           ));
         } else {
           elts.push(React.createElement(
