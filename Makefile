@@ -9,7 +9,7 @@ lib: $(LIB)
 pub: $(PUB)
 lib/%.js: src/%.js
 	mkdir -p $(@D)
-#	babel --modules common $< -o $@
+	babel --modules common $< -o $@
 	browserify -t babelify src/viewer.js > pub/viewer.js
 
 pub/%.js: lib/%.js
