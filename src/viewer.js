@@ -12,7 +12,7 @@ window.exports.viewer = (function () {
     tick: function() {
       let secondsElapsed = this.props.secondsElapsed;
       let state = {
-        secondsElapsed: (secondsElapsed ? secondsElapsed : 0) + 5;
+        secondsElapsed: (secondsElapsed ? secondsElapsed : 0) + 5
       };
       window.dispatcher.dispatch({
         data: state,
