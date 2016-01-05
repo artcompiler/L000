@@ -2,7 +2,7 @@
 /* vim: set shiftwidth=2 tabstop=2 autoindent cindent expandtab: */
 /* Copyright (c) 2015, Art Compiler LLC */
 import {assert, message, messages, reserveCodeRange} from "./assert";
-import * as React from "./react";
+import * as React from "react";
 window.exports.viewer = (function () {
   function capture(el) {
     var mySVG = $(el).html();
