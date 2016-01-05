@@ -6030,14 +6030,14 @@ window.exports.viewer = (function () {
     tick: function tick() {
       var secondsElapsed = this.props.secondsElapsed;
       var state = {
-        secondsElapsed: (secondsElapsed ? secondsElapsed : 0) + 1
+        secondsElapsed: (secondsElapsed ? secondsElapsed : 0) + 5
       };
       window.dispatcher.dispatch({
         data: state
       });
     },
     componentDidMount: function componentDidMount() {
-      this.interval = setInterval(this.tick, 1000);
+      this.interval = setInterval(this.tick, 5000);
     },
     componentWillUnmount: function componentWillUnmount() {
       clearInterval(this.interval);
@@ -6046,7 +6046,7 @@ window.exports.viewer = (function () {
       return React.createElement(
         "div",
         null,
-        this.props.secondsElapsed
+        this.props.secondsElapsed ? this.props.secondsElapsed : 0
       );
     }
   });

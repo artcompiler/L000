@@ -26,7 +26,7 @@ window.exports.viewer = (function () {
     },
     render: function() {
       return (
-          <div>{this.props.secondsElapsed}</div>
+          <div>{this.props.secondsElapsed?this.props.secondsElapsed:0}</div>
       );
     }
   });
