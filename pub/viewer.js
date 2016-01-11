@@ -19098,6 +19098,9 @@ window.exports.viewer = (function () {
       var state = {
         secondsElapsed: (secondsElapsed ? secondsElapsed : 0) + 5
       };
+      // To save state, dispatch it as a property named 'data'. This will save
+      // the state to the server, update the URL and the props used to render
+      // the view.
       window.dispatcher.dispatch({
         data: state
       });
@@ -19116,6 +19119,8 @@ window.exports.viewer = (function () {
       );
     }
   });
+  // Graffiticode looks for this React class named Viewer. The compiled code is
+  // passed via props in the renderer.
   var Viewer = React.createClass({
     displayName: "Viewer",
 
