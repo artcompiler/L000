@@ -1,6 +1,10 @@
 /* -*- Mode: js; js-indent-level: 2; indent-tabs-mode: nil; tab-width: 2 -*- */
 /* vim: set shiftwidth=2 tabstop=2 autoindent cindent expandtab: */
 /* Copyright (c) 2015, Art Compiler LLC */
+/*
+   TODO
+   -- Update code based on user intput.
+*/
 import {assert, message, messages, reserveCodeRange} from "./assert";
 import * as React from "react";
 window.exports.viewer = (function () {
@@ -14,6 +18,9 @@ window.exports.viewer = (function () {
       let state = {
         secondsElapsed: (secondsElapsed ? secondsElapsed : 0) + 5
       };
+      // To save state, dispatch it as a property named 'data'. This will save
+      // the state to the server, update the URL and the props used to render
+      // the view.
       window.dispatcher.dispatch({
         data: state,
       });
@@ -30,6 +37,8 @@ window.exports.viewer = (function () {
       );
     }
   });
+  // Graffiticode looks for this React class named Viewer. The compiled code is
+  // passed via props in the renderer.
   var Viewer = React.createClass({
     render: function () {
       // If you have nested components, make sure you send the props down to the
