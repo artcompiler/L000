@@ -527,15 +527,21 @@ module.exports = focusNode;
  * @typechecks
  */
 
+/* eslint-disable fb-www/typeof-undefined */
+
 /**
  * Same as document.activeElement but wraps in a try-catch block. In IE it is
  * not safe to call document.activeElement if there is nothing focused.
  *
- * The activeElement will be null only if the document body is not yet defined.
+ * The activeElement will be null only if the document or document body is not
+ * yet defined.
  */
-"use strict";
+'use strict';
 
 function getActiveElement() /*?DOMElement*/{
+  if (typeof document === 'undefined') {
+    return null;
+  }
   try {
     return document.activeElement || document.body;
   } catch (e) {
@@ -19007,7 +19013,7 @@ var location = "";
 var messages = {};
 var reservedCodes = [];
 var ASSERT = true;
-var assert = (function () {
+var assert = function () {
   return !ASSERT ? function () {} : function (val, str) {
     if (str === void 0) {
       str = "failed!";
@@ -19018,7 +19024,7 @@ var assert = (function () {
       throw err;
     }
   };
-})();
+}();
 
 var message = function message(errorCode, args) {
   var str = messages[errorCode];
@@ -19077,6 +19083,8 @@ var React = _interopRequireWildcard(_react);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
+//import * as ReactDOM from "react-dom";
+//var React;
 /* -*- Mode: js; js-indent-level: 2; indent-tabs-mode: nil; tab-width: 2 -*- */
 /* vim: set shiftwidth=2 tabstop=2 autoindent cindent expandtab: */
 /* Copyright (c) 2015, Art Compiler LLC */
@@ -19084,8 +19092,8 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
    TODO
    -- Update code based on user intput.
 */
-
-window.exports.viewer = (function () {
+var ReactDOM;
+window.exports.viewer = function () {
   function capture(el) {
     var mySVG = $(el).html();
     return mySVG;
@@ -19124,6 +19132,10 @@ window.exports.viewer = (function () {
   var Viewer = React.createClass({
     displayName: "Viewer",
 
+    componentDidMount: function componentDidMount() {
+      ReactDOM = window.exports.ReactDOM;
+      var node = ReactDOM.findDOMNode(this);
+    },
     render: function render() {
       // If you have nested components, make sure you send the props down to the
       // owned components.
@@ -19162,7 +19174,7 @@ window.exports.viewer = (function () {
     capture: capture,
     Viewer: Viewer
   };
-})();
+}();
 
 },{"./assert":157,"react":156}],159:[function(require,module,exports){
 // shim for using process in browser

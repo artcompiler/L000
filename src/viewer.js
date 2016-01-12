@@ -40,6 +40,10 @@ window.exports.viewer = (function () {
   // Graffiticode looks for this React class named Viewer. The compiled code is
   // passed via props in the renderer.
   var Viewer = React.createClass({
+    componentDidMount: function() {
+      ReactDOM = window.exports.ReactDOM;
+      var node = ReactDOM.findDOMNode(this);
+    },
     render: function () {
       // If you have nested components, make sure you send the props down to the
       // owned components.
