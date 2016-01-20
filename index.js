@@ -63,7 +63,6 @@ app.get('/view/:id', function(req, res) {
         console.log("error=" + error.stack);
         res.send(400, error);
       } else {
-        console.log("html=" + html);
         res.send(html);
       }
     });

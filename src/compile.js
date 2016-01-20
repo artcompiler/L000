@@ -13,7 +13,6 @@ messages[1004] = "No visitor method defined for '%1'.";
 let translate = (function() {
   let nodePool;
   function translate(pool, resume) {
-    console.log("pool=" + JSON.stringify(pool, null, 2));
     nodePool = pool;
     return visit(pool.root, {}, resume);
   }
@@ -77,7 +76,6 @@ let translate = (function() {
   function style(node, options, resume) {
     visit(node.elts[0], options, function (err1, val1) {
       visit(node.elts[1], options, function (err2, val2) {
-        console.log("style() val1=" + JSON.stringify(val1));
         resume([].concat(err1).concat(err2), {
           value: val1.value,
           style: val2,

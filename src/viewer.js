@@ -7,6 +7,9 @@
 */
 import {assert, message, messages, reserveCodeRange} from "./assert";
 import * as React from "react";
+//import * as ReactDOM from "react-dom";
+import ProseMirror from 'react-prosemirror'
+
 window.exports.viewer = (function () {
   function capture(el) {
     var mySVG = $(el).html();
@@ -37,12 +40,31 @@ window.exports.viewer = (function () {
       );
     }
   });
+
+  const Prose = React.createClass({
+    getInitialState() {
+      return {
+        value: 'Hello World!'
+      };
+    },
+    render() {
+      let options = {
+        options: {
+          docFormat: 'text',
+          place: 'graff-view',
+        }
+      };
+      return <ProseMirror value={this.state.value} onChange={this.onChange} {...options} ref="pm" />
+    },
+    onChange(value) {
+      this.setState({value});
+    }
+  });
+
   // Graffiticode looks for this React class named Viewer. The compiled code is
   // passed via props in the renderer.
   var Viewer = React.createClass({
     componentDidMount: function() {
-      ReactDOM = window.exports.ReactDOM;
-      var node = ReactDOM.findDOMNode(this);
     },
     render: function () {
       // If you have nested components, make sure you send the props down to the
@@ -59,6 +81,8 @@ window.exports.viewer = (function () {
         }
         if (d.value === "$$timer$$") {
           elts.push(<span key={i} style={style}><Timer {...props}/></span>);
+        } else if (d.value === "$$prose$$") {
+          return <Prose id="editor" style={style}/>;
         } else {
           elts.push(<span key={i} style={style}>{""+d.value}</span>);
         }
