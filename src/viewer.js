@@ -1,5 +1,3 @@
-/* -*- Mode: js; js-indent-level: 2; indent-tabs-mode: nil; tab-width: 2 -*- */
-/* vim: set shiftwidth=2 tabstop=2 autoindent cindent expandtab: */
 /* Copyright (c) 2015, Art Compiler LLC */
 /*
    TODO
@@ -76,7 +74,7 @@ window.exports.viewer = (function () {
         var style = {};
         if (d.style) {
           d.style.forEach(function (p) {
-            style[p.key[0]] = p.val.value;
+            style[p.key] = p.val;
           });
         }
         if (d.value === "$$timer$$") {

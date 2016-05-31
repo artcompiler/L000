@@ -30836,9 +30836,7 @@ exports.reserveCodeRange = reserveCodeRange;
 },{}],206:[function(require,module,exports){
 "use strict";
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; /* -*- Mode: js; js-indent-level: 2; indent-tabs-mode: nil; tab-width: 2 -*- */
-/* vim: set shiftwidth=2 tabstop=2 autoindent cindent expandtab: */
-/* Copyright (c) 2015, Art Compiler LLC */
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; /* Copyright (c) 2015, Art Compiler LLC */
 /*
    TODO
    -- Update code based on user intput.
@@ -30932,7 +30930,7 @@ window.exports.viewer = function () {
         var style = {};
         if (d.style) {
           d.style.forEach(function (p) {
-            style[p.key[0]] = p.val.value;
+            style[p.key] = p.val;
           });
         }
         if (d.value === "$$timer$$") {

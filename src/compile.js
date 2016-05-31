@@ -1,6 +1,4 @@
-/* -*- Mode: js; js-indent-level: 2; indent-tabs-mode: nil; tab-width: 2 -*- */
-/* vim: set shiftwidth=2 tabstop=2 autoindent cindent expandtab: */
-/* Copyright (c) 2015, Art Compiler LLC */
+/* Copyright (c) 2016, Art Compiler LLC */
 
 import {assert, message, messages, reserveCodeRange} from "./assert.js"
 
@@ -52,7 +50,9 @@ let translate = (function() {
   }
   function ident(node, options, resume) {
     let val = node.elts[0];
-    resume([], [val]);
+    resume([], {
+      value: val
+    });
   }
   function bool(node, options, resume) {
     let val = node.elts[0];
@@ -102,7 +102,7 @@ let translate = (function() {
   function binding(node, options, resume) {
     visit(node.elts[0], options, function (err1, val1) {
       visit(node.elts[1], options, function (err2, val2) {
-        resume([].concat(err1).concat(err2), {key: val1, val: val2});
+        resume([].concat(err1).concat(err2), {key: val1.value, val: val2.value});
       });
     });
   };
@@ -183,12 +183,10 @@ export let compiler = (function () {
     // an object to be rendered on the client by the viewer for this language.
     try {
       translate(pool, function (err, val) {
-        console.log("translate err=" + JSON.stringify(err, null, 2) + "\nval=" + JSON.stringify(val, null, 2));
         if (err.length) {
           resume(err, val);
         } else {
           render(val, function (err, val) {
-            console.log("render err=" + JSON.stringify(err, null, 2) + "\nval=" + JSON.stringify(val, null, 2));
             resume(err, val);
           });
         }
