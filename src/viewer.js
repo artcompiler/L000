@@ -5,8 +5,6 @@
 */
 import {assert, message, messages, reserveCodeRange} from "./assert";
 import * as React from "react";
-//import * as ReactDOM from "react-dom";
-import ProseMirror from 'react-prosemirror'
 
 window.exports.viewer = (function () {
   function capture(el) {
@@ -39,26 +37,6 @@ window.exports.viewer = (function () {
     }
   });
 
-  const Prose = React.createClass({
-    getInitialState() {
-      return {
-        value: 'Hello World!'
-      };
-    },
-    render() {
-      let options = {
-        options: {
-          docFormat: 'text',
-          place: 'graff-view',
-        }
-      };
-      return <ProseMirror value={this.state.value} onChange={this.onChange} {...options} ref="pm" />
-    },
-    onChange(value) {
-      this.setState({value});
-    }
-  });
-
   // Graffiticode looks for this React class named Viewer. The compiled code is
   // passed via props in the renderer.
   var Viewer = React.createClass({
@@ -79,8 +57,6 @@ window.exports.viewer = (function () {
         }
         if (d.value === "$$timer$$") {
           elts.push(<span key={i} style={style}><Timer {...props}/></span>);
-        } else if (d.value === "$$prose$$") {
-          return <Prose id="editor" style={style}/>;
         } else {
           elts.push(<span key={i} style={style}>{""+d.value}</span>);
         }
