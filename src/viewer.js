@@ -21,6 +21,7 @@ window.exports.viewer = (function () {
       // the state to the server, update the URL and the props used to render
       // the view.
       window.dispatcher.dispatch({
+        updateHistory: true,
         data: state,
       });
     },
