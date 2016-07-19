@@ -12,8 +12,7 @@
     "domready": "^1.0.8"
   },
   "engines": {
-    "npm": "latest",
-    "node": "latest"
+    "node": "0.10.x"
   },
   "repository": {
     "type": "git",

@@ -1,0 +1,18 @@
+.editor {
+	border-collapse: collapse;
+	width: 800px;
+	height: 400px;
+	max-width: 100%;
+}
+.editor th {
+	text-align: left;
+	border-right: 1px solid #999;
+	width: 4em;
+}
+.editor th, .demo td {
+	padding: 1em;
+}
+
+.editor .options label {
+	margin-right: .5em;
+}
