@@ -44,7 +44,8 @@ function compile() {
 function bundle() {
   console.log("Bundling...");
   exec("browserify ./lib/viewer.js -s viewer > ./pub/viewer.js");
-  exec("mv ./lib/lexicon.js ./pub");
+  exec("cp ./src/lexicon.js ./pub");
+  exec("cp ./src/style.css ./pub");
 }
 
 function build() {
