@@ -52,14 +52,18 @@ window.exports.viewer = (function () {
       data.forEach(function (d, i) {
         var style = {};
         if (d.style) {
-          d.style.forEach(function (p) {
-            style[p.key] = p.val;
+          Object.keys(d.style).forEach(function (k) {
+            style[k] = d.style[k];
           });
         }
         if (d.value === "$$timer$$") {
           elts.push(<span key={i} style={style}><Timer {...props}/></span>);
         } else {
-          elts.push(<span key={i} style={style}>{""+d.value}</span>);
+          let val = d.value ? d.value : d;
+          if (val instanceof Array) {
+            val = val.join(" ");
+          }
+          elts.push(<span key={i} style={style}>{"" + val}</span>);
         }
       });
       return (

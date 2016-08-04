@@ -5,12 +5,12 @@ import {assert, message, messages, reserveCodeRange} from "./assert.js"
 reserveCodeRange(1000, 1999, "compile");
 messages[1001] = "Node ID %1 not found in pool.";
 messages[1002] = "Invalid tag in node with Node ID %1.";
-messages[1003] = "No aync callback provided.";
+messages[1003] = "No async callback provided.";
 messages[1004] = "No visitor method defined for '%1'.";
 
-let translate = (function() {
+let transform = (function() {
   let nodePool;
-  function translate(pool, resume) {
+  function transform(pool, resume) {
     nodePool = pool;
     return visit(pool.root, {}, resume);
   }
@@ -35,37 +35,30 @@ let translate = (function() {
     return table[node.tag](node, options, resume);
   }
   // BEGIN VISITOR METHODS
-  let edgesNode;
   function str(node, options, resume) {
     let val = node.elts[0];
-    resume([], {
-      value: val
-    });
+    resume([], val);
   }
   function num(node, options, resume) {
     let val = node.elts[0];
-    resume([], {
-      value: val
-    });
+    resume([], +val);
   }
   function ident(node, options, resume) {
     let val = node.elts[0];
-    resume([], {
-      value: val
-    });
+    resume([], val);
   }
   function bool(node, options, resume) {
     let val = node.elts[0];
-    resume([], [val]);
+    resume([], !!val);
   }
   function add(node, options, resume) {
     visit(node.elts[0], options, function (err1, val1) {
-      val1 = +val1.value;
+      val1 = +val1;
       if (isNaN(val1)) {
         err1 = err1.concat(error("Argument must be a number.", node.elts[0]));
       }
       visit(node.elts[1], options, function (err2, val2) {
-        val2 = +val2.value;
+        val2 = +val2;
         if (isNaN(val2)) {
           err2 = err2.concat(error("Argument must be a number.", node.elts[1]));
         }
@@ -77,7 +70,7 @@ let translate = (function() {
     visit(node.elts[0], options, function (err1, val1) {
       visit(node.elts[1], options, function (err2, val2) {
         resume([].concat(err1).concat(err2), {
-          value: val1.value,
+          value: val1,
           style: val2,
         });
       });
@@ -86,14 +79,20 @@ let translate = (function() {
   function list(node, options, resume) {
     if (node.elts && node.elts.length > 1) {
       visit(node.elts[0], options, function (err1, val1) {
-        node.elts.shift();
+        node = {
+          tag: "LIST",
+          elts: node.elts.slice(1),
+        };
         list(node, options, function (err2, val2) {
-          resume([].concat(err1).concat(err2), [].concat(val1).concat(val2));
+          let val = [].concat(val2);
+          val.unshift(val1);
+          resume([].concat(err1).concat(err2), val);
         });
       });
-    } else if (node.elts && node.elts.length === 0) {
+    } else if (node.elts && node.elts.length > 0) {
       visit(node.elts[0], options, function (err1, val1) {
-        resume([].concat(err1), [].concat(val1));
+        let val = [val1];
+        resume([].concat(err1), val);
       });
     } else {
       resume([], []);
@@ -102,21 +101,28 @@ let translate = (function() {
   function binding(node, options, resume) {
     visit(node.elts[0], options, function (err1, val1) {
       visit(node.elts[1], options, function (err2, val2) {
-        resume([].concat(err1).concat(err2), {key: val1.value, val: val2.value});
+        resume([].concat(err1).concat(err2), {key: val1, val: val2});
       });
     });
   };
   function record(node, options, resume) {
     if (node.elts && node.elts.length > 1) {
       visit(node.elts[0], options, function (err1, val1) {
-        node.elts.shift();
+        node = {
+          tag: "RECORD",
+          elts: node.elts.slice(1),
+        };
         record(node, options, function (err2, val2) {
-          resume([].concat(err1).concat(err2), [].concat(val1).concat(val2));
+          let val = [].concat(val2);
+          val2[val1.key] = val1.val;
+          resume([].concat(err1).concat(err2), val2);
         });
       });
     } else if (node.elts && node.elts.length > 0) {
       visit(node.elts[0], options, function (err1, val1) {
-        resume([].concat(err1), [].concat(val1));
+        let val = {};
+        val[val1.key] = val1.val;
+        resume([].concat(err1), val);
       });
     } else {
       resume([], []);
@@ -125,14 +131,20 @@ let translate = (function() {
   function exprs(node, options, resume) {
     if (node.elts && node.elts.length > 1) {
       visit(node.elts[0], options, function (err1, val1) {
-        node.elts.shift();
+        node = {
+          tag: "EXPRS",
+          elts: node.elts.slice(1),
+        };
         exprs(node, options, function (err2, val2) {
-          resume([].concat(err1).concat(err2), [].concat(val1).concat(val2));
+          let val = [].concat(val2);
+          val.unshift(val1);
+          resume([].concat(err1).concat(err2), val);
         });
       });
     } else if (node.elts && node.elts.length > 0) {
       visit(node.elts[0], options, function (err1, val1) {
-        resume([].concat(err1), [].concat(val1));
+        let val = [val1];
+        resume([].concat(err1), val);
       });
     } else {
       resume([], []);
@@ -159,7 +171,7 @@ let translate = (function() {
     "ADD" : add,
     "STYLE" : style,
   }
-  return translate;
+  return transform;
 })();
 let render = (function() {
   function escapeXML(str) {
@@ -179,10 +191,10 @@ let render = (function() {
 })();
 export let compiler = (function () {
   exports.compile = function compile(pool, resume) {
-    // Compiler takes an AST in the form of a node pool and translates it into
+    // Compiler takes an AST in the form of a node pool and transforms it into
     // an object to be rendered on the client by the viewer for this language.
     try {
-      translate(pool, function (err, val) {
+      transform(pool, function (err, val) {
         if (err.length) {
           resume(err, val);
         } else {
