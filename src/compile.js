@@ -65,7 +65,7 @@ let transform = (function() {
         resume([].concat(err1).concat(err2), val1 + val2);
       });
     });
-  };
+  }
   function style(node, options, resume) {
     visit(node.elts[0], options, function (err1, val1) {
       visit(node.elts[1], options, function (err2, val2) {
@@ -75,7 +75,7 @@ let transform = (function() {
         });
       });
     });
-  };
+  }
   function list(node, options, resume) {
     if (node.elts && node.elts.length > 1) {
       visit(node.elts[0], options, function (err1, val1) {
@@ -97,23 +97,18 @@ let transform = (function() {
     } else {
       resume([], []);
     }
-  };
+  }
   function binding(node, options, resume) {
     visit(node.elts[0], options, function (err1, val1) {
       visit(node.elts[1], options, function (err2, val2) {
         resume([].concat(err1).concat(err2), {key: val1, val: val2});
       });
     });
-  };
+  }
   function record(node, options, resume) {
     if (node.elts && node.elts.length > 1) {
-      visit(node.elts[0], options, function (err1, val1) {
-        node = {
-          tag: "RECORD",
-          elts: node.elts.slice(1),
-        };
+      visit(node.elts.pop(), options, function (err1, val1) {
         record(node, options, function (err2, val2) {
-          let val = [].concat(val2);
           val2[val1.key] = val1.val;
           resume([].concat(err1).concat(err2), val2);
         });
@@ -125,9 +120,9 @@ let transform = (function() {
         resume([].concat(err1), val);
       });
     } else {
-      resume([], []);
+      resume([], {});
     }
-  };
+  }
   function exprs(node, options, resume) {
     if (node.elts && node.elts.length > 1) {
       visit(node.elts[0], options, function (err1, val1) {
@@ -149,7 +144,7 @@ let transform = (function() {
     } else {
       resume([], []);
     }
-  };
+  }
   function program(node, options, resume) {
     if (!options) {
       options = {};
