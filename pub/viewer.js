@@ -1,4 +1,9 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.viewer = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 /* -*- Mode: js; js-indent-level: 2; indent-tabs-mode: nil; tab-width: 2 -*- */
 /* vim: set shiftwidth=2 tabstop=2 autoindent cindent expandtab: */
 /*
@@ -16,7 +21,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-"use strict";
+
 /*
   ASSERTS AND MESSAGES
 
@@ -78,10 +83,6 @@
 
 */
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-var location = "";
 var messages = {};
 var reservedCodes = [];
 var ASSERT = true;
@@ -92,13 +93,14 @@ var assert = function () {
     }
     if (!val) {
       var err = new Error(str);
-      err.location = location;
       throw err;
     }
   };
 }();
 
-var message = function message(errorCode, args) {
+var message = function message(errorCode) {
+  var args = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+
   var str = messages[errorCode];
   if (args) {
     args.forEach(function (arg, i) {
@@ -115,28 +117,6 @@ var reserveCodeRange = function reserveCodeRange(first, last, moduleName) {
   });
   assert(noConflict, "Conflicting request for error code range");
   reservedCodes.push({ first: first, last: last, name: moduleName });
-};
-
-var setLocation = function setLocation(location) {
-  //assert(location, "Empty location");
-  location = loc;
-};
-
-var clearLocation = function clearLocation() {
-  location = null;
-};
-
-var setCounter = function setCounter(n, message) {
-  count = n;
-  countMessage = message ? message : "ERROR count exceeded";
-};
-
-var checkCounter = function checkCounter() {
-  if (typeof count !== "number" || isNaN(count)) {
-    assert(false, "ERROR counter not set");
-    return;
-  }
-  assert(count--, countMessage);
 };
 
 exports.assert = assert;
@@ -162,12 +142,12 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 */
 window.exports.viewer = function () {
   function capture(el) {
-    var mySVG = $(el).html();
-    return mySVG;
+    return null;
   }
   var Timer = React.createClass({
     displayName: "Timer",
 
+    interval: 0,
     tick: function tick() {
       var secondsElapsed = this.props.secondsElapsed;
       var state = {

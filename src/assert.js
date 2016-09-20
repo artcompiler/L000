@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-"use strict";
+/* @flow */
 /*
   ASSERTS AND MESSAGES
 
@@ -77,26 +77,24 @@
 
 */
 
-let location = "";
 const messages = {};
 const reservedCodes = [];
 let ASSERT = true;
 let assert = (function () {
   return !ASSERT ?
     function () { } :
-    function (val, str) {
+    function (val: boolean, str: string) {
       if ( str === void 0 ) {
         str = "failed!";
       }
       if ( !val ) {
         let err = new Error(str);
-        err.location = location;
         throw err;
       }
     }
 })();
 
-let message = function (errorCode, args) {
+let message = function (errorCode: number, args: Array<string> = []) {
   let str = messages[errorCode];
   if (args) {
     args.forEach(function (arg, i) {
@@ -106,35 +104,13 @@ let message = function (errorCode, args) {
   return errorCode + ": " + str;
 };
 
-let reserveCodeRange = function (first, last, moduleName) {
+let reserveCodeRange = function (first: number, last: number, moduleName: string) {
   assert(first <= last, "Invalid code range");
   let noConflict = reservedCodes.every(function (range) {
     return last < range.first || first > range.last;
   });
   assert(noConflict, "Conflicting request for error code range");
   reservedCodes.push({first: first, last: last, name: moduleName});
-}
-
-let setLocation = function (location) {
-  //assert(location, "Empty location");
-  location = loc;
-}
-
-let clearLocation = function () {
-  location = null;
-}
-
-let setCounter = function (n, message) {
-  count = n;
-  countMessage = message ? message : "ERROR count exceeded";
-}
-
-let checkCounter = function () {
-  if (typeof count !== "number" || isNaN(count)) {
-    assert(false, "ERROR counter not set");
-    return;
-  }
-  assert(count--, countMessage);
 }
 
 export {

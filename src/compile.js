@@ -1,4 +1,5 @@
 /* Copyright (c) 2016, Art Compiler LLC */
+/* @flow */
 
 import {assert, message, messages, reserveCodeRange} from "./assert.js"
 

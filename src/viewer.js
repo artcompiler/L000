@@ -1,5 +1,5 @@
 /* Copyright (c) 2016, Art Compiler LLC */
-
+/* @flow */
 /*
    TODO
    -- Update code based on user intput.
@@ -9,10 +9,10 @@ import * as React from "react";
 
 window.exports.viewer = (function () {
   function capture(el) {
-    var mySVG = $(el).html();
-    return mySVG;
+    return null;
   }
   var Timer = React.createClass({
+    interval: 0,
     tick: function() {
       let secondsElapsed = this.props.secondsElapsed;
       let state = {
@@ -34,7 +34,7 @@ window.exports.viewer = (function () {
     },
     render: function() {
       return (
-          <div>{this.props.secondsElapsed?this.props.secondsElapsed:0}</div>
+        <div>{this.props.secondsElapsed?this.props.secondsElapsed:0}</div>
       );
     }
   });
