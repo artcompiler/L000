@@ -1,7 +1,7 @@
-/* -*- Mode: js; js-indent-level: 2; indent-tabs-mode: nil; tab-width: 2 -*- */
-/* vim: set shiftwidth=2 tabstop=2 autoindent cindent expandtab: */
 /*
    L000 compiler service.
+
+   @flow weak
 */
 var fs = require('fs');
 var http = require('http');
