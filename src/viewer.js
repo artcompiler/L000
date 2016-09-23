@@ -1,9 +1,5 @@
 /* Copyright (c) 2016, Art Compiler LLC */
 /* @flow */
-/*
-   TODO
-   -- Update code based on user intput.
-*/
 import {assert, message, messages, reserveCodeRange} from "./assert";
 import * as React from "react";
 
