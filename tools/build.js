@@ -41,14 +41,14 @@ function compile() {
   exec("babel src --out-dir lib");
 }
 
-function bundle(production) {
+function bundle(debug) {
   console.log("Bundling...");
   exec("cp ./src/lexicon.js ./pub");
   exec("cp ./src/style.css ./pub");
-  if (production) {
-    exec("browserify ./lib/viewer.js -s viewer | uglifyjs --screw-ie8 > ./pub/viewer.js");
-  } else {
+  if (debug) {
     exec("browserify ./lib/viewer.js -s viewer > ./pub/viewer.js");
+  } else {
+    exec("browserify ./lib/viewer.js -s viewer | uglifyjs --screw-ie8 > ./pub/viewer.js");
   }
 }
 
