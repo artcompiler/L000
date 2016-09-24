@@ -26,10 +26,6 @@ var version = {
   graffiti: "v0.0.0",
 };
 
-app.get('/.well-known/acme-challenge/:content', function(req, res) {
-  res.send('rjr3_W5SvN97Yu0SV6qgVUxAfr1nGTaroB4wyuGB1hs.Fzpon67yOJjoArf9Yosy2tR5vF2zLd5fJ3tSglCuLoI')
-});
-
 app.get('/version', function(req, res) {
   res.send(version);
 });
