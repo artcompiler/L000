@@ -3,7 +3,7 @@
 import {assert, message, messages, reserveCodeRange} from "./assert";
 import * as React from "react";
 
-window.exports.viewer = (function () {
+window.gcexports.viewer = (function () {
   function capture(el) {
     return null;
   }
