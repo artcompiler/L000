@@ -77,6 +77,19 @@ let transform = (function() {
       });
     });
   }
+  function concat(node, options, resume) {
+    visit(node.elts[0], options, function (err1, val1) {
+      let str = "";
+      if (val1 instanceof Array) {       
+        val1.forEach(v => {
+          str += v;
+        });
+      } else {
+        str = val1.toString();
+      }
+      resume(err1, str);
+    });
+  }
   function list(node, options, resume) {
     if (node.elts && node.elts.length > 1) {
       visit(node.elts[0], options, function (err1, val1) {
@@ -166,6 +179,7 @@ let transform = (function() {
     "BINDING": binding,
     "ADD" : add,
     "STYLE" : style,
+    "CONCAT" : concat,
   }
   return transform;
 })();
@@ -187,6 +201,7 @@ let render = (function() {
 })();
 export let compiler = (function () {
   exports.compile = function compile(pool, resume) {
+    console.log("compile() pool=" + JSON.stringify(pool, null, 2));
     // Compiler takes an AST in the form of a node pool and transforms it into
     // an object to be rendered on the client by the viewer for this language.
     try {
@@ -202,7 +217,7 @@ export let compiler = (function () {
     } catch (x) {
       console.log("ERROR with code");
       console.log(x.stack);
-      resume("Compiler error", {
+      resume(["Compiler error"], {
         score: 0
       });
     }
