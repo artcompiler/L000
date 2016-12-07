@@ -13,6 +13,7 @@ let transform = (function() {
   let nodePool;
   function transform(pool, resume) {
     nodePool = pool;
+    console.log("transform() nodePool=" + JSON.stringify(nodePool, null, 2));
     return visit(pool.root, {}, resume);
   }
   function error(str, nid) {
@@ -52,7 +53,47 @@ let transform = (function() {
     let val = node.elts[0];
     resume([], !!val);
   }
+  function key(node, options, resume) {
+    visit(node.elts[0], options, function (err1, val1) {
+      let key = val1;
+      if (false) {
+        err1 = err1.concat(error("Argument must be a number.", node.elts[0]));
+      }
+      visit(node.elts[1], options, function (err2, val2) {
+        let obj = val2;
+        if (false) {
+          err2 = err2.concat(error("Argument must be a number.", node.elts[1]));
+        }
+        resume([].concat(err1).concat(err2), Object.keys(obj)[key]);
+      });
+    });
+  }
+  function val(node, options, resume) {
+    visit(node.elts[0], options, function (err1, val1) {
+      let key = val1;
+      if (false) {
+        err1 = err1.concat(error("Argument must be a number.", node.elts[0]));
+      }
+      visit(node.elts[1], options, function (err2, val2) {
+        let obj = val2;
+        if (false) {
+          err2 = err2.concat(error("Argument must be a number.", node.elts[1]));
+        }
+        resume([].concat(err1).concat(err2), obj[key]);
+      });
+    });
+  }
+  function len(node, options, resume) {
+    visit(node.elts[0], options, function (err1, val1) {
+      let obj = val1;
+      if (false) {
+        err1 = err1.concat(error("Argument must be a number.", node.elts[0]));
+      }
+      resume([].concat(err1), obj.length);
+    });
+  }
   function add(node, options, resume) {
+    console.log("add() node=" + JSON.stringify(node, null, 2));
     visit(node.elts[0], options, function (err1, val1) {
       val1 = +val1;
       if (isNaN(val1)) {
@@ -70,9 +111,10 @@ let transform = (function() {
   function style(node, options, resume) {
     visit(node.elts[0], options, function (err1, val1) {
       visit(node.elts[1], options, function (err2, val2) {
+        console.log("style() val1=" + JSON.stringify(val1));
         resume([].concat(err1).concat(err2), {
-          value: val1,
-          style: val2,
+          style: val1,
+          value: val2,
         });
       });
     });
@@ -113,6 +155,7 @@ let transform = (function() {
     }
   }
   function binding(node, options, resume) {
+    console.log("record() node=" + JSON.stringify(node));
     visit(node.elts[0], options, function (err1, val1) {
       visit(node.elts[1], options, function (err2, val2) {
         resume([].concat(err1).concat(err2), {key: val1, val: val2});
@@ -120,8 +163,13 @@ let transform = (function() {
     });
   }
   function record(node, options, resume) {
+    console.log("record() node=" + JSON.stringify(node));
     if (node.elts && node.elts.length > 1) {
-      visit(node.elts.pop(), options, function (err1, val1) {
+      visit(node.elts[0], options, function (err1, val1) {
+        node = {
+          tag: "RECORD",
+          elts: node.elts.slice(1),
+        };
         record(node, options, function (err2, val2) {
           val2[val1.key] = val1.val;
           resume([].concat(err1).concat(err2), val2);
@@ -178,6 +226,9 @@ let transform = (function() {
     "RECORD": record,
     "BINDING": binding,
     "ADD" : add,
+    "VAL" : val,
+    "KEY" : key,
+    "LEN" : len,
     "STYLE" : style,
     "CONCAT" : concat,
   }
@@ -201,7 +252,6 @@ let render = (function() {
 })();
 export let compiler = (function () {
   exports.compile = function compile(pool, resume) {
-    console.log("compile() pool=" + JSON.stringify(pool, null, 2));
     // Compiler takes an AST in the form of a node pool and transforms it into
     // an object to be rendered on the client by the viewer for this language.
     try {

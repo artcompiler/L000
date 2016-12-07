@@ -52,12 +52,12 @@ function bundle(debug) {
   }
 }
 
-function build() {
+function build(debug) {
   let t0 = Date.now();
   clean();
   compile();
-  bundle();
+  bundle(debug);
   console.log("Build completed in " + (Date.now() - t0) + " ms");
 }
 
-build();
+build(true);

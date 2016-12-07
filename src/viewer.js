@@ -59,8 +59,12 @@ window.gcexports.viewer = (function () {
           let val = d.value ? d.value : d;
           if (val instanceof Array) {
             val = val.join(" ");
+          } else if (typeof val !== "string" &&
+                     typeof val !== "number" &&
+                     typeof val !== "boolean") {
+            val = JSON.stringify(val);
           }
-          elts.push(<span key={i} style={style}>{"" + val}</span>);
+          elts.push(<span key={i} style={style}>{val}</span>);
         }
       });
       return (
