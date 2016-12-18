@@ -14,6 +14,12 @@ app.get('/', function(req, res) {
   res.send("Hello, L000!");
 });
 
+// LetsEncript acme challenge
+app.get('/.well-known/acme-challenge/Fat9s216-BheFxzOVTCk2BpbQqDEnE_Jh49sAZFAxgo', function(req, res) {
+  res.send("Fat9s216-BheFxzOVTCk2BpbQqDEnE_Jh49sAZFAxgo.Fzpon67yOJjoArf9Yosy2tR5vF2zLd5fJ3tSglCuLoI");
+});
+
+
 
 var compiler = require("./lib/compile.js");
 // Graffiti Code will load the version of itself that matches the graffiti
@@ -29,6 +35,7 @@ var version = {
 app.get('/version', function(req, res) {
   res.send(version);
 });
+
 app.get('/compile', function(req, res) {
   var data = "";
   req.on("data", function (chunk) {
