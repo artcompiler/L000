@@ -22,6 +22,7 @@ let transform = (function() {
     "RECORD": record,
     "BINDING": binding,
     "ADD" : add,
+    "MUL" : mul,
     "STYLE" : style,
   }, {
     // v1
@@ -35,6 +36,7 @@ let transform = (function() {
     "RECORD": record,
     "BINDING": binding,
     "ADD" : add,
+    "MUL" : mul,
     "VAL" : val,
     "KEY" : key,
     "LEN" : len,
@@ -224,7 +226,6 @@ let transform = (function() {
     });
   }
   function add(node, options, resume) {
-    console.log("add() node=" + JSON.stringify(node, null, 2));
     visit(node.elts[0], options, function (err1, val1) {
       val1 = +val1;
       if (isNaN(val1)) {
@@ -236,6 +237,21 @@ let transform = (function() {
           err2 = err2.concat(error("Argument must be a number.", node.elts[1]));
         }
         resume([].concat(err1).concat(err2), val1 + val2);
+      });
+    });
+  }
+  function mul(node, options, resume) {
+    visit(node.elts[0], options, function (err1, val1) {
+      val1 = +val1;
+      if (isNaN(val1)) {
+        err1 = err1.concat(error("Argument must be a number.", node.elts[0]));
+      }
+      visit(node.elts[1], options, function (err2, val2) {
+        val2 = +val2;
+        if (isNaN(val2)) {
+          err2 = err2.concat(error("Argument must be a number.", node.elts[1]));
+        }
+        resume([].concat(err1).concat(err2), val1 * val2);
       });
     });
   }

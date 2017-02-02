@@ -20,8 +20,8 @@ app.get("/compile", function(req, res) {
   });
   req.on('end', function () {
     body = JSON.parse(body);
-    let code = payload.src;
-    let data = payload.data;
+    let code = body.src;
+    let data = body.data;
     let obj = compiler.compile(code, data, function (err, val) {
       if (err.length) {
         res.send({
