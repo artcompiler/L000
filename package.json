@@ -5,7 +5,7 @@
   "author": "Art Compiler LLC",
   "main": "index.js",
   "scripts": {
-    "start": "node --harmony index.js",
+    "start": "node index.js",
     "build": "./node_modules/babel-cli/bin/babel-node.js tools/build",
     "flow": "flow; test $? -eq 0 -o $? -eq 2"
   },

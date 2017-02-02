@@ -10,10 +10,47 @@ messages[1003] = "No async callback provided.";
 messages[1004] = "No visitor method defined for '%1'.";
 
 let transform = (function() {
+  let table = [{
+    // v0
+    "PROG" : program,
+    "EXPRS" : exprs,
+    "STR": str,
+    "NUM": num,
+    "IDENT": ident,
+    "BOOL": bool,
+    "LIST": list,
+    "RECORD": record,
+    "BINDING": binding,
+    "ADD" : add,
+    "STYLE" : style,
+  }, {
+    // v1
+    "PROG" : program,
+    "EXPRS" : exprs,
+    "STR": str,
+    "NUM": num,
+    "IDENT": ident,
+    "BOOL": bool,
+    "LIST": list,
+    "RECORD": record,
+    "BINDING": binding,
+    "ADD" : add,
+    "VAL" : val,
+    "KEY" : key,
+    "LEN" : len,
+    "STYLE" : styleV1,
+    "CONCAT" : concat,
+  }];
   let nodePool;
-  function transform(pool, resume) {
+  let dataPool;
+  let version;
+  function getVersion(pool) {
+    return pool.version ? +pool.version : 0;
+  }
+  function transform(pool, data, resume) {
     nodePool = pool;
-    console.log("transform() nodePool=" + JSON.stringify(nodePool, null, 2));
+    dataPool = data;
+    version = getVersion(pool);
     return visit(pool.root, {}, resume);
   }
   function error(str, nid) {
@@ -33,8 +70,8 @@ let transform = (function() {
     }
     assert(node, message(1001, [nid]));
     assert(node.tag, message(1001, [nid]));
-    assert(typeof table[node.tag] === "function", message(1004, [JSON.stringify(node.tag)]));
-    return table[node.tag](node, options, resume);
+    assert(typeof table[version][node.tag] === "function", message(1004, [JSON.stringify(node.tag)]));
+    return table[version][node.tag](node, options, resume);
   }
   // BEGIN VISITOR METHODS
   function str(node, options, resume) {
@@ -52,6 +89,100 @@ let transform = (function() {
   function bool(node, options, resume) {
     let val = node.elts[0];
     resume([], !!val);
+  }
+  function concat(node, options, resume) {
+    visit(node.elts[0], options, function (err1, val1) {
+      let str = "";
+      if (val1 instanceof Array) {
+        val1.forEach(v => {
+          str += v;
+        });
+      } else {
+        str = val1.toString();
+      }
+      resume(err1, str);
+    });
+  }
+  function list(node, options, resume) {
+    if (node.elts && node.elts.length > 1) {
+      visit(node.elts[0], options, function (err1, val1) {
+        node = {
+          tag: "LIST",
+          elts: node.elts.slice(1),
+        };
+        list(node, options, function (err2, val2) {
+          let val = [].concat(val2);
+          val.unshift(val1);
+          resume([].concat(err1).concat(err2), val);
+        });
+      });
+    } else if (node.elts && node.elts.length > 0) {
+      visit(node.elts[0], options, function (err1, val1) {
+        let val = [val1];
+        resume([].concat(err1), val);
+      });
+    } else {
+      resume([], []);
+    }
+  }
+  function binding(node, options, resume) {
+    visit(node.elts[0], options, function (err1, val1) {
+      visit(node.elts[1], options, function (err2, val2) {
+        resume([].concat(err1).concat(err2), {key: val1, val: val2});
+      });
+    });
+  }
+  function record(node, options, resume) {
+    if (node.elts && node.elts.length > 1) {
+      visit(node.elts[0], options, function (err1, val1) {
+        node = {
+          tag: "RECORD",
+          elts: node.elts.slice(1),
+        };
+        record(node, options, function (err2, val2) {
+          val2[val1.key] = val1.val;
+          resume([].concat(err1).concat(err2), val2);
+        });
+      });
+    } else if (node.elts && node.elts.length > 0) {
+      visit(node.elts[0], options, function (err1, val1) {
+        let val = {};
+        val[val1.key] = val1.val;
+        resume([].concat(err1), val);
+      });
+    } else {
+      resume([], {});
+    }
+  }
+  function exprs(node, options, resume) {
+    if (node.elts && node.elts.length > 1) {
+      visit(node.elts[0], options, function (err1, val1) {
+        node = {
+          tag: "EXPRS",
+          elts: node.elts.slice(1),
+        };
+        exprs(node, options, function (err2, val2) {
+          let val = [].concat(val2);
+          val.unshift(val1);
+          resume([].concat(err1).concat(err2), val);
+        });
+      });
+    } else if (node.elts && node.elts.length > 0) {
+      visit(node.elts[0], options, function (err1, val1) {
+        let val = [val1];
+        resume([].concat(err1), val);
+      });
+    } else {
+      resume([], []);
+    }
+  }
+  function program(node, options, resume) {
+    if (!options) {
+      options = {};
+    }
+    visit(node.elts[0], options, function (err, val) {
+      resume(err, val);
+    });
   }
   function key(node, options, resume) {
     visit(node.elts[0], options, function (err1, val1) {
@@ -113,124 +244,22 @@ let transform = (function() {
       visit(node.elts[1], options, function (err2, val2) {
         console.log("style() val1=" + JSON.stringify(val1));
         resume([].concat(err1).concat(err2), {
+          value: val1,
+          style: val2,
+        });
+      });
+    });
+  }
+  function styleV1(node, options, resume) {
+    visit(node.elts[0], options, function (err1, val1) {
+      visit(node.elts[1], options, function (err2, val2) {
+        console.log("style() val1=" + JSON.stringify(val1));
+        resume([].concat(err1).concat(err2), {
           style: val1,
           value: val2,
         });
       });
     });
-  }
-  function concat(node, options, resume) {
-    visit(node.elts[0], options, function (err1, val1) {
-      let str = "";
-      if (val1 instanceof Array) {       
-        val1.forEach(v => {
-          str += v;
-        });
-      } else {
-        str = val1.toString();
-      }
-      resume(err1, str);
-    });
-  }
-  function list(node, options, resume) {
-    if (node.elts && node.elts.length > 1) {
-      visit(node.elts[0], options, function (err1, val1) {
-        node = {
-          tag: "LIST",
-          elts: node.elts.slice(1),
-        };
-        list(node, options, function (err2, val2) {
-          let val = [].concat(val2);
-          val.unshift(val1);
-          resume([].concat(err1).concat(err2), val);
-        });
-      });
-    } else if (node.elts && node.elts.length > 0) {
-      visit(node.elts[0], options, function (err1, val1) {
-        let val = [val1];
-        resume([].concat(err1), val);
-      });
-    } else {
-      resume([], []);
-    }
-  }
-  function binding(node, options, resume) {
-    console.log("record() node=" + JSON.stringify(node));
-    visit(node.elts[0], options, function (err1, val1) {
-      visit(node.elts[1], options, function (err2, val2) {
-        resume([].concat(err1).concat(err2), {key: val1, val: val2});
-      });
-    });
-  }
-  function record(node, options, resume) {
-    console.log("record() node=" + JSON.stringify(node));
-    if (node.elts && node.elts.length > 1) {
-      visit(node.elts[0], options, function (err1, val1) {
-        node = {
-          tag: "RECORD",
-          elts: node.elts.slice(1),
-        };
-        record(node, options, function (err2, val2) {
-          val2[val1.key] = val1.val;
-          resume([].concat(err1).concat(err2), val2);
-        });
-      });
-    } else if (node.elts && node.elts.length > 0) {
-      visit(node.elts[0], options, function (err1, val1) {
-        let val = {};
-        val[val1.key] = val1.val;
-        resume([].concat(err1), val);
-      });
-    } else {
-      resume([], {});
-    }
-  }
-  function exprs(node, options, resume) {
-    if (node.elts && node.elts.length > 1) {
-      visit(node.elts[0], options, function (err1, val1) {
-        node = {
-          tag: "EXPRS",
-          elts: node.elts.slice(1),
-        };
-        exprs(node, options, function (err2, val2) {
-          let val = [].concat(val2);
-          val.unshift(val1);
-          resume([].concat(err1).concat(err2), val);
-        });
-      });
-    } else if (node.elts && node.elts.length > 0) {
-      visit(node.elts[0], options, function (err1, val1) {
-        let val = [val1];
-        resume([].concat(err1), val);
-      });
-    } else {
-      resume([], []);
-    }
-  }
-  function program(node, options, resume) {
-    if (!options) {
-      options = {};
-    }
-    visit(node.elts[0], options, function (err, val) {
-      resume(err, val);
-    });
-  }
-  let table = {
-    "PROG" : program,
-    "EXPRS" : exprs,
-    "STR": str,
-    "NUM": num,
-    "IDENT": ident,
-    "BOOL": bool,
-    "LIST": list,
-    "RECORD": record,
-    "BINDING": binding,
-    "ADD" : add,
-    "VAL" : val,
-    "KEY" : key,
-    "LEN" : len,
-    "STYLE" : style,
-    "CONCAT" : concat,
   }
   return transform;
 })();
@@ -251,11 +280,12 @@ let render = (function() {
   return render;
 })();
 export let compiler = (function () {
-  exports.compile = function compile(pool, resume) {
+  exports.version = "v1.0.0";
+  exports.compile = function compile(code, data, resume) {
     // Compiler takes an AST in the form of a node pool and transforms it into
     // an object to be rendered on the client by the viewer for this language.
     try {
-      transform(pool, function (err, val) {
+      transform(code, data, function (err, val) {
         if (err.length) {
           resume(err, val);
         } else {
