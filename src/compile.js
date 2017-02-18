@@ -37,23 +37,27 @@ let transform = (function() {
     "BINDING": binding,
     "ADD" : add,
     "MUL" : mul,
+    "ARG" : arg,
     "VAL" : val,
     "KEY" : key,
     "LEN" : len,
     "STYLE" : styleV1,
     "CONCAT" : concat,
+    "DATA" : data,
+    "LAMBDA" : lambda,
+    "PAREN" : paren,
+    "APPLY" : apply,
+    "MAP" : map,
   }];
   let nodePool;
-  let dataPool;
   let version;
   function getVersion(pool) {
     return pool.version ? +pool.version : 0;
   }
-  function transform(pool, data, resume) {
-    nodePool = pool;
-    dataPool = data;
-    version = getVersion(pool);
-    return visit(pool.root, {}, resume);
+  function transform(code, data, resume) {
+    nodePool = code;
+    version = getVersion(code);
+    return visit(code.root, data, resume);
   }
   function error(str, nid) {
     return {
@@ -105,6 +109,11 @@ let transform = (function() {
       resume(err1, str);
     });
   }
+  function paren(node, options, resume) {
+    visit(node.elts[0], options, function (err1, val1) {
+      resume(err1, val1);
+    });
+  }
   function list(node, options, resume) {
     if (node.elts && node.elts.length > 1) {
       visit(node.elts[0], options, function (err1, val1) {
@@ -126,6 +135,56 @@ let transform = (function() {
     } else {
       resume([], []);
     }
+  }
+  function data(node, options, resume) {
+    console.log("data() options=" + JSON.stringify(options));
+    resume([], options.data);
+  }
+  function args(node, options, resume) {
+    console.log("args() options=" + JSON.stringify(options));
+    resume([], options.args);
+  }
+  function lambda(node, options, resume) {
+    // Return a function value.
+    console.log("lambda() node=" + JSON.stringify(node));
+    visit(node.elts[0], options, function (err1, val1) {
+      visit(node.elts[1], options, function (err2, val2) {
+        console.log("lambda() val1=" + JSON.stringify(val1));
+        console.log("lambda() val2=" + JSON.stringify(val2));
+        resume([].concat(err1).concat(err2), val2);
+      });
+    });
+  }
+  function apply(node, options, resume) {
+    console.log("apply() node=" + JSON.stringify(node, null, 2));
+    // Apply a function to arguments.
+    visit(node.elts[1], options, function (err1, val1) {
+      // args
+      options.args = [val1];
+      visit(node.elts[0], options, function (err0, val0) {
+        // fn
+        console.log("apply() val0=" + JSON.stringify(val0));
+        console.log("apply() val1=" + JSON.stringify(val1));
+        resume([].concat(err1).concat(err0), val0);
+      });
+    });
+  }
+  function map(node, options, resume) {
+    console.log("map() node=" + JSON.stringify(node, null, 2));
+    // Apply a function to arguments.
+    visit(node.elts[1], options, function (err1, val1) {
+      // args
+      let errs = [];
+      let vals = [];
+      val1.forEach((val) => {
+        options.args = [val];
+        visit(node.elts[0], options, function (err0, val0) {
+          vals.push(val0);
+          errs = errs.concat(err0);
+        });
+      });
+      resume(errs, vals);
+    });
   }
   function binding(node, options, resume) {
     visit(node.elts[0], options, function (err1, val1) {
@@ -183,6 +242,7 @@ let transform = (function() {
       options = {};
     }
     visit(node.elts[0], options, function (err, val) {
+      // Return the value of the last expression.
       resume(err, val);
     });
   }
@@ -201,6 +261,16 @@ let transform = (function() {
       });
     });
   }
+  function arg(node, options, resume) {
+    visit(node.elts[0], options, function (err1, val1) {
+      let key = val1;
+      if (false) {
+        err1 = err1.concat(error("Argument must be a number.", node.elts[0]));
+      }
+      console.log("arg() key=" + key + " options.args=" + JSON.stringify(options.args));
+      resume([].concat(err1), options.args[key]);
+    });
+  }
   function val(node, options, resume) {
     visit(node.elts[0], options, function (err1, val1) {
       let key = val1;
@@ -212,6 +282,8 @@ let transform = (function() {
         if (false) {
           err2 = err2.concat(error("Argument must be a number.", node.elts[1]));
         }
+        console.log("val() key=" + key);
+        console.log("val() obj=" + JSON.stringify(obj));
         resume([].concat(err1).concat(err2), obj[key]);
       });
     });
@@ -258,7 +330,6 @@ let transform = (function() {
   function style(node, options, resume) {
     visit(node.elts[0], options, function (err1, val1) {
       visit(node.elts[1], options, function (err2, val2) {
-        console.log("style() val1=" + JSON.stringify(val1));
         resume([].concat(err1).concat(err2), {
           value: val1,
           style: val2,
@@ -269,7 +340,6 @@ let transform = (function() {
   function styleV1(node, options, resume) {
     visit(node.elts[0], options, function (err1, val1) {
       visit(node.elts[1], options, function (err2, val2) {
-        console.log("style() val1=" + JSON.stringify(val1));
         resume([].concat(err1).concat(err2), {
           style: val1,
           value: val2,
@@ -298,10 +368,15 @@ let render = (function() {
 export let compiler = (function () {
   exports.version = "v1.0.0";
   exports.compile = function compile(code, data, resume) {
+    console.log("compile() code=" + JSON.stringify(code, null, 2));
+    console.log("compile() data=" + JSON.stringify(data, null, 2));
     // Compiler takes an AST in the form of a node pool and transforms it into
     // an object to be rendered on the client by the viewer for this language.
     try {
-      transform(code, data, function (err, val) {
+      let options = {
+        data: data
+      };
+      transform(code, options, function (err, val) {
         if (err.length) {
           resume(err, val);
         } else {
