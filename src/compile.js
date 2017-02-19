@@ -137,40 +137,31 @@ let transform = (function() {
     }
   }
   function data(node, options, resume) {
-    console.log("data() options=" + JSON.stringify(options));
     resume([], options.data);
   }
   function args(node, options, resume) {
-    console.log("args() options=" + JSON.stringify(options));
     resume([], options.args);
   }
   function lambda(node, options, resume) {
     // Return a function value.
-    console.log("lambda() node=" + JSON.stringify(node));
     visit(node.elts[0], options, function (err1, val1) {
       visit(node.elts[1], options, function (err2, val2) {
-        console.log("lambda() val1=" + JSON.stringify(val1));
-        console.log("lambda() val2=" + JSON.stringify(val2));
         resume([].concat(err1).concat(err2), val2);
       });
     });
   }
   function apply(node, options, resume) {
-    console.log("apply() node=" + JSON.stringify(node, null, 2));
     // Apply a function to arguments.
     visit(node.elts[1], options, function (err1, val1) {
       // args
       options.args = [val1];
       visit(node.elts[0], options, function (err0, val0) {
         // fn
-        console.log("apply() val0=" + JSON.stringify(val0));
-        console.log("apply() val1=" + JSON.stringify(val1));
         resume([].concat(err1).concat(err0), val0);
       });
     });
   }
   function map(node, options, resume) {
-    console.log("map() node=" + JSON.stringify(node, null, 2));
     // Apply a function to arguments.
     visit(node.elts[1], options, function (err1, val1) {
       // args
@@ -267,7 +258,6 @@ let transform = (function() {
       if (false) {
         err1 = err1.concat(error("Argument must be a number.", node.elts[0]));
       }
-      console.log("arg() key=" + key + " options.args=" + JSON.stringify(options.args));
       resume([].concat(err1), options.args[key]);
     });
   }
@@ -282,8 +272,6 @@ let transform = (function() {
         if (false) {
           err2 = err2.concat(error("Argument must be a number.", node.elts[1]));
         }
-        console.log("val() key=" + key);
-        console.log("val() obj=" + JSON.stringify(obj));
         resume([].concat(err1).concat(err2), obj[key]);
       });
     });
@@ -368,8 +356,6 @@ let render = (function() {
 export let compiler = (function () {
   exports.version = "v1.0.0";
   exports.compile = function compile(code, data, resume) {
-    console.log("compile() code=" + JSON.stringify(code, null, 2));
-    console.log("compile() data=" + JSON.stringify(data, null, 2));
     // Compiler takes an AST in the form of a node pool and transforms it into
     // an object to be rendered on the client by the viewer for this language.
     try {
