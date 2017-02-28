@@ -37,12 +37,12 @@ let transform = (function() {
     "BINDING": binding,
     "ADD" : add,
     "MUL" : mul,
-    "ARG" : arg,
     "VAL" : val,
     "KEY" : key,
     "LEN" : len,
     "STYLE" : styleV1,
     "CONCAT" : concat,
+    "ARG" : arg,
     "DATA" : data,
     "LAMBDA" : lambda,
     "PAREN" : paren,
@@ -138,6 +138,15 @@ let transform = (function() {
   }
   function data(node, options, resume) {
     resume([], options.data);
+  }
+  function arg(node, options, resume) {
+    visit(node.elts[0], options, function (err1, val1) {
+      let key = val1;
+      if (false) {
+        err1 = err1.concat(error("Argument must be a number.", node.elts[0]));
+      }
+      resume([].concat(err1), options.args[key]);
+    });
   }
   function args(node, options, resume) {
     resume([], options.args);
@@ -250,15 +259,6 @@ let transform = (function() {
         }
         resume([].concat(err1).concat(err2), Object.keys(obj)[key]);
       });
-    });
-  }
-  function arg(node, options, resume) {
-    visit(node.elts[0], options, function (err1, val1) {
-      let key = val1;
-      if (false) {
-        err1 = err1.concat(error("Argument must be a number.", node.elts[0]));
-      }
-      resume([].concat(err1), options.args[key]);
     });
   }
   function val(node, options, resume) {

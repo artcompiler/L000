@@ -28,7 +28,7 @@ app.get("/compile", function(req, res) {
           error: err,
         });
       } else {
-        res.send({
+        res.json({
           data: val,
         });
       }
