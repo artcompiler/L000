@@ -243,7 +243,7 @@ let transform = (function() {
     }
     visit(node.elts[0], options, function (err, val) {
       // Return the value of the last expression.
-      resume(err, val);
+      resume(err, val.pop());
     });
   }
   function key(node, options, resume) {

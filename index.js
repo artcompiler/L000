@@ -28,9 +28,7 @@ app.get("/compile", function(req, res) {
           error: err,
         });
       } else {
-        res.json({
-          data: val,
-        });
+        res.json(val);
       }
     });
   });
