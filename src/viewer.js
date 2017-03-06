@@ -44,9 +44,9 @@ window.gcexports.viewer = (function () {
       // If you have nested components, make sure you send the props down to the
       // owned components.
       var props = this.props;
-      var data = props.data ? [].concat(props.data) : [];
+      var obj = props.obj ? [].concat(props.obj) : [];
       var elts = [];
-      data.forEach(function (d, i) {
+      obj.forEach(function (d, i) {
         var style = {};
         if (d.style) {
           Object.keys(d.style).forEach(function (k) {
