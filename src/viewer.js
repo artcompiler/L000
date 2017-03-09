@@ -2,11 +2,34 @@
 /* @flow */
 import {assert, message, messages, reserveCodeRange} from "./assert";
 import * as React from "react";
+import * as d3 from "d3";
 
 window.gcexports.viewer = (function () {
   function capture(el) {
     return null;
   }
+  // Return a new array by collecting the results of the specified function
+  // for each element in the current selection, passing in the current datum d
+  // and index i, with the this context of the current DOM element.
+  d3.selection.prototype.map_flat = function(f) {
+    var arr = [];
+    this.each(function(d, i) {
+      arr[arr.length] = f.call(this, d, i);
+    });
+    return arr;
+  };
+  
+  // Return a new nested array by collecting the results of the specified function
+  // for each element in the current selection, passing in the current datum d
+  // and indexes i and j with the this context of the current DOM element.
+  d3.selection.prototype.map_nested = function(f) {
+    var arr = d3.range(this.length).map(function() { return []; });
+    this.each(function(d, i, j) {
+      arr[j].push(f.call(this, d, i, j));
+    });
+    return arr;
+  };
+
   var Timer = React.createClass({
     interval: 0,
     tick: function() {
