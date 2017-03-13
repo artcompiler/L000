@@ -137,7 +137,8 @@ let transform = (function() {
     }
   }
   function inData(node, options, resume) {
-    resume([], options.data);
+    let data = options.data ? options.data : [];
+    resume([], data);
   }
   function arg(node, options, resume) {
     visit(node.elts[0], options, function (err1, val1) {
