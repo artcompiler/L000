@@ -43,7 +43,7 @@ let transform = (function() {
     "STYLE" : styleV1,
     "CONCAT" : concat,
     "ARG" : arg,
-    "DATA" : data,
+    "IN" : inData,
     "LAMBDA" : lambda,
     "PAREN" : paren,
     "APPLY" : apply,
@@ -136,7 +136,7 @@ let transform = (function() {
       resume([], []);
     }
   }
-  function data(node, options, resume) {
+  function inData(node, options, resume) {
     resume([], options.data);
   }
   function arg(node, options, resume) {
