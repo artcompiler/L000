@@ -7,6 +7,9 @@ var compiler = require("./lib/compile.js");
 var app = express();
 app.set('port', (process.env.PORT || 5000));
 app.use(express.static(__dirname + '/pub'));
+app.get('/.well-known/acme-challenge/AW6bCjR8Qi3HwiKD5emcP-HiFa1zBrtr4DVu8xLRKwI', function(req, res) {
+  res.send("AW6bCjR8Qi3HwiKD5emcP-HiFa1zBrtr4DVu8xLRKwI.Fzpon67yOJjoArf9Yosy2tR5vF2zLd5fJ3tSglCuLoI");
+});
 app.get('/', function(req, res) {
   res.send("Hello, L000!");
 });
