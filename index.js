@@ -40,9 +40,6 @@ app.get("/compile", function(req, res) {
     res.send(e);
   });
 });
-app.get('/.well-known/acme-challenge/EcgD3S-I_DUYp9tdDeP5Hhq21JpEC3cCbutTIUx0xtE', function(req, res) {
-  res.send("EcgD3S-I_DUYp9tdDeP5Hhq21JpEC3cCbutTIUx0xtE.Fzpon67yOJjoArf9Yosy2tR5vF2zLd5fJ3tSglCuLoI");
-});
 app.listen(app.get('port'), function() {
   console.log("Node app is running at localhost:" + app.get('port'))
 });

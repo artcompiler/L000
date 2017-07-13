@@ -142,9 +142,6 @@ window.gcexports.viewer = function () {
   function capture(el) {
     return null;
   }
-
-  // Graffiticode looks for this React class named Viewer. The compiled code is
-  // passed via props in the renderer.
   var Viewer = React.createClass({
     displayName: "Viewer",
 
@@ -162,25 +159,17 @@ window.gcexports.viewer = function () {
             style[k] = d.style[k];
           });
         }
-        if (d.value === "$$timer$$") {
-          elts.push(React.createElement(
-            "span",
-            { key: i, style: style },
-            React.createElement(Timer, props)
-          ));
-        } else {
-          var val = d.value ? d.value : d;
-          if (val instanceof Array) {
-            val = val.join(" ");
-          } else if (typeof val !== "string" && typeof val !== "number" && typeof val !== "boolean") {
-            val = JSON.stringify(val);
-          }
-          elts.push(React.createElement(
-            "span",
-            { key: i, style: style },
-            val
-          ));
+        var val = d.value ? d.value : d;
+        if (val instanceof Array) {
+          val = val.join(" ");
+        } else if (typeof val !== "string" && typeof val !== "number" && typeof val !== "boolean") {
+          val = JSON.stringify(val);
         }
+        elts.push(React.createElement(
+          "span",
+          { key: i, style: style },
+          val
+        ));
       });
       return elts.length > 0 ? React.createElement(
         "div",
@@ -193,7 +182,7 @@ window.gcexports.viewer = function () {
     capture: capture,
     Viewer: Viewer
   };
-}(); /* Copyright (c) 2016, Art Compiler LLC */
+}(); /* Copyright (c) 2017, Art Compiler LLC */
 },{"./assert":1,"d3":3,"react":160}],3:[function(require,module,exports){
 // https://d3js.org Version 4.7.1. Copyright 2017 Mike Bostock.
 (function (global, factory) {
