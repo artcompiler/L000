@@ -1,6 +1,13 @@
 /* Copyright (c) 2017, Art Compiler LLC */
 /* @flow */
-import {assert, message, messages, reserveCodeRange} from "./assert";
+import {
+  assert,
+  message,
+  messages,
+  reserveCodeRange,
+  decodeID,
+  encodeID,
+} from "./share.js";
 import * as React from "react";
 import * as d3 from "d3";
 window.gcexports.viewer = (function () {
