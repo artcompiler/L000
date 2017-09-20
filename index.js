@@ -17,7 +17,6 @@ app.get('/', function(req, res) {
 app.get("/version", function(req, res) {
   res.send(compiler.version ? compiler.version : "v0.0.0");
 });
-
 function postAuth(path, data, resume) {
   let encodedData = JSON.stringify(data);
   var options = {
@@ -52,7 +51,6 @@ function postAuth(path, data, resume) {
     resume(err);
   });
 }
-
 const validated = {};
 function validate(token, resume) {
   if (token === undefined) {
@@ -71,7 +69,6 @@ function validate(token, resume) {
     });
   }
 }
-
 app.get("/compile", function(req, res) {
   let body = "";
   req.on("data", function (chunk) {
@@ -84,19 +81,24 @@ app.get("/compile", function(req, res) {
       if (err) {
         res.send(err);
       } else {
-        let code = body.src;
-        let data = body.data;
-        let t0 = new Date;
-        let obj = compiler.compile(code, data, function (err, val) {
-          if (err.length) {
-            res.send({
-              error: err,
-            });
-          } else {
-            console.log("GET /compile " + (new Date - t0) + "ms");
-            res.json(val);
-          }
-        });
+        if (data.access.indexOf("compile") === -1) {
+          // Don't have compile access.
+          res.sendStatus(401).send(err);
+        } else {
+          let code = body.src;
+          let data = body.data;
+          let t0 = new Date;
+          let obj = compiler.compile(code, data, function (err, val) {
+            if (err.length) {
+              res.send({
+                error: err,
+              });
+            } else {
+              console.log("GET /compile " + (new Date - t0) + "ms");
+              res.json(val);
+            }
+          });
+        }
       }
     });
   });
