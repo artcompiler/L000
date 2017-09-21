@@ -51,6 +51,13 @@ function postAuth(path, data, resume) {
     resume(err);
   });
 }
+function count(token, count) {
+  postAuth("/count", {
+    jwt: token,
+    lang: "L000",
+    count: count,
+  }, () => {});
+}
 const validated = {};
 function validate(token, resume) {
   if (token === undefined) {
@@ -60,12 +67,15 @@ function validate(token, resume) {
     });
   } else if (validated[token]) {
     resume(null, validated[token]);
+    count(token, 1);
   } else {
     postAuth("/validate", {
-      jwt: token
+      jwt: token,
+      lang: "L000",
     }, (err, data) => {
       validated[token] = data;
       resume(err, data);
+      count(token, 1);
     });
   }
 }
