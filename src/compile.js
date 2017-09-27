@@ -8,6 +8,7 @@ import {
   reserveCodeRange,
   decodeID,
   encodeID,
+  validate,
 } from "./share.js"
 
 reserveCodeRange(1000, 1999, "compile");
@@ -16,22 +17,8 @@ messages[1002] = "Invalid tag in node with Node ID %1.";
 messages[1003] = "No async callback provided.";
 messages[1004] = "No visitor method defined for '%1'.";
 
-let transform = (function() {
-  let table = [{
-    // v0
-    "PROG" : program,
-    "EXPRS" : exprs,
-    "STR": str,
-    "NUM": num,
-    "IDENT": ident,
-    "BOOL": bool,
-    "LIST": list,
-    "RECORD": record,
-    "BINDING": binding,
-    "ADD" : add,
-    "MUL" : mul,
-    "STYLE" : style,
-  }, {
+const transform = (function() {
+  const table = {
     // v1
     "PROG" : program,
     "EXPRS" : exprs,
@@ -55,7 +42,7 @@ let transform = (function() {
     "PAREN" : paren,
     "APPLY" : apply,
     "MAP" : map,
-  }];
+  };
   let nodePool;
   let version;
   function getVersion(pool) {
@@ -83,8 +70,8 @@ let transform = (function() {
     }
     assert(node, message(1001, [nid]));
     assert(node.tag, message(1001, [nid]));
-    assert(typeof table[version][node.tag] === "function", message(1004, [JSON.stringify(node.tag)]));
-    return table[version][node.tag](node, options, resume);
+    assert(typeof table[node.tag] === "function", message(1004, [JSON.stringify(node.tag)]));
+    return table[node.tag](node, options, resume);
   }
   // BEGIN VISITOR METHODS
   function str(node, options, resume) {
