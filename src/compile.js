@@ -76,6 +76,7 @@ const transform = (function() {
   // BEGIN VISITOR METHODS
   function str(node, options, resume) {
     let val = node.elts[0];
+    
     resume([], val);
   }
   function num(node, options, resume) {
@@ -353,6 +354,7 @@ export let compiler = (function () {
   exports.compile = function compile(code, data, resume) {
     // Compiler takes an AST in the form of a node pool and transforms it into
     // an object to be rendered on the client by the viewer for this language.
+    console.log("compile() data=" + JSON.stringify(data));
     try {
       let options = {
         data: data
