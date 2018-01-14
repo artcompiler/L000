@@ -342,7 +342,7 @@ let render = (function() {
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
   }
-  function render(val, resume) {
+  function render(val, options, resume) {
     // Do some rendering here.
     resume([], val);
   }
@@ -361,7 +361,7 @@ export let compiler = (function () {
         if (err.length) {
           resume(err, val);
         } else {
-          render(val, function (err, val) {
+          render(val, options, function (err, val) {
             resume(err, val);
           });
         }
