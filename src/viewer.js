@@ -43,7 +43,9 @@ window.gcexports.viewer = (function () {
       return (
         elts.length > 0 ? <div>
           <link rel="stylesheet" href="https://l000.artcompiler.com/style.css" />
+          <div className="L000">
           {elts}
+          </div>
         </div> : <div/>
       );
     },
