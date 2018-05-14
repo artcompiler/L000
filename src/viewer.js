@@ -41,7 +41,10 @@ window.gcexports.viewer = (function () {
         elts.push(<span key={i} style={style}>{val}</span>);
       });
       return (
-        elts.length > 0 ? <div>{elts}</div> : <div/>
+        elts.length > 0 ? <div>
+          <link rel="stylesheet" href="https://l000.artcompiler.com/style.css" />
+          {elts}
+        </div> : <div/>
       );
     },
   });
