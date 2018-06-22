@@ -63,7 +63,10 @@ const transform = (function() {
     assert(typeof resume === "function", message(1003));
     // Get the node from the pool of nodes.
     let node;
-    if (typeof nid === "object") {
+    if (!nid) {
+      resume([], null);
+      return;
+    } else if (typeof nid === "object") {
       node = nid;
     } else {
       node = nodePool[nid];
@@ -83,8 +86,9 @@ const transform = (function() {
     resume([], +val);
   }
   function ident(node, options, resume) {
-    let val = node.elts[0];
-    resume([], val);
+    // FIXME lookup identifier in environment.
+    let word = findWord(options, node.elts[0]);
+    resume([], word && word.val || node.elts[0]);
   }
   function bool(node, options, resume) {
     let val = node.elts[0];
@@ -146,36 +150,85 @@ const transform = (function() {
   function args(node, options, resume) {
     resume([], options.args);
   }
+  function enterEnv(ctx, name, paramc) {
+    if (!ctx.env) {
+      ctx.env = [];
+    }
+    // recursion guard
+    if (ctx.env.length > 380) {
+      //return;  // just stop recursing
+      throw new Error("runaway recursion");
+    }
+    ctx.env.push({
+      name: name,
+      paramc: paramc,
+      lexicon: {},
+      pattern: [],
+    });
+  }
+  function exitEnv(ctx) {
+    ctx.env.pop();
+  }
+  function findWord(ctx, lexeme) {
+    let env = ctx.env;
+    if (!env) {
+      return null;
+    }
+    for (var i = env.length-1; i >= 0; i--) {
+      var word = env[i].lexicon[lexeme];
+      if (word) {
+        return word;
+      }
+    }
+    return null;
+  }
+  function addWord(ctx, lexeme, entry) {
+    topEnv(ctx).lexicon[lexeme] = entry;
+    return null;
+  }
+  function topEnv(ctx) {
+    return ctx.env[ctx.env.length-1]
+  }
   function lambda(node, options, resume) {
     // Return a function value.
-    visit(node.elts[0], options, function (err1, val1) {
-      visit(node.elts[1], options, function (err2, val2) {
-        resume([].concat(err1).concat(err2), val2);
+    visit(node.elts[0], options, function (err0, params) {
+      visit(node.elts[3], options, function (err3, inits) {
+        let args = [].concat(options.args);
+        enterEnv(options, "lambda", params.length);
+        params.forEach(function (param, i) {
+          addWord(options, param, {
+            name: param,
+            val: args[i],
+          });
+        });
+        visit(node.elts[1], options, function (err, val) {
+          exitEnv(options);
+          resume([].concat(err0).concat(err).concat(err), val)
+        });
       });
     });
   }
   function apply(node, options, resume) {
     // Apply a function to arguments.
-    visit(node.elts[1], options, function (err1, val1) {
-      // args
-      options.args = [val1];
-      visit(node.elts[0], options, function (err0, val0) {
-        // fn
-        resume([].concat(err1).concat(err0), val0);
+    visit(node.elts[1], options, function (err1, args) {
+      options.args = args;
+      visit(node.elts[0], options, function (err0, val) {
+        exitEnv(options);
+        resume([].concat(err0), val);
       });
     });
   }
   function map(node, options, resume) {
     // Apply a function to arguments.
-    visit(node.elts[1], options, function (err1, val1) {
+    visit(node.elts[1], options, function (err1, argsList) {
       // args
       let errs = [];
       let vals = [];
-      val1.forEach((val) => {
-        options.args = [val];
-        visit(node.elts[0], options, function (err0, val0) {
-          vals.push(val0);
-          errs = errs.concat(err0);
+      argsList.forEach(args => {
+        options.args = args;
+        visit(node.elts[0], options, function (err, val) {
+          vals.push(val);
+          errs = errs.concat(err);
         });
       });
       resume(errs, vals);

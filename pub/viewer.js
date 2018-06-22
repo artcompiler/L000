@@ -284,7 +284,9 @@ window.gcexports.viewer = function () {
   var Viewer = React.createClass({
     displayName: "Viewer",
 
-    componentDidMount: function componentDidMount() {},
+    componentDidMount: function componentDidMount() {
+      d3.select("#graff-view").append("div").classed("done-rendering", true);
+    },
     render: function render() {
       // If you have nested components, make sure you send the props down to the
       // owned components.

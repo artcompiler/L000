@@ -2,12 +2,12 @@
    L000 compiler service.
    @flow weak
 */
-const https = require("https");
-const express = require('express')
-const app = express();
 const langID = "000";
 // SHARED START
+const https = require("https");
+const express = require('express')
 const compiler = require("./lib/compile.js");
+const app = express();
 app.set('port', (process.env.PORT || "5" + langID));
 app.use(express.static(__dirname + '/pub'));
 app.get('/', function(req, res) {
