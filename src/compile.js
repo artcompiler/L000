@@ -45,6 +45,9 @@ const transform = (function() {
   };
   let nodePool;
   let version;
+  function node(nid) {
+    return nodePool[nid];
+  }
   function getVersion(pool) {
     return pool.version ? +pool.version : 0;
   }
@@ -86,7 +89,6 @@ const transform = (function() {
     resume([], +val);
   }
   function ident(node, options, resume) {
-    // FIXME lookup identifier in environment.
     let word = findWord(options, node.elts[0]);
     resume([], word && word.val || node.elts[0]);
   }
@@ -191,20 +193,42 @@ const transform = (function() {
   }
   function lambda(node, options, resume) {
     // Return a function value.
+    console.log("lambda() nodePool=" + JSON.stringify(nodePool, null, 2));
+    console.log("lambda() node=" + JSON.stringify(node, null, 2));
     visit(node.elts[0], options, function (err0, params) {
-      visit(node.elts[3], options, function (err3, inits) {
-        let args = [].concat(options.args);
-        enterEnv(options, "lambda", params.length);
-        params.forEach(function (param, i) {
+      let args = [].concat(options.args);
+      console.log("lambda() args=" + JSON.stringify(args));
+      enterEnv(options, "lambda", params.length);
+      params.forEach(function (param, i) {
+        let inits = nodePool[node.elts[3]].elts;
+        if (args[i]) {
+          console.log("lambda() param=" + param + " val=" + args[i]);
+          // Got an arg so use it.
           addWord(options, param, {
             name: param,
             val: args[i],
           });
-        });
-        visit(node.elts[1], options, function (err, val) {
-          exitEnv(options);
-          resume([].concat(err0).concat(err).concat(err), val)
-        });
+        } else {
+          // Don't got an arg so use the init.
+          visit(inits[i], options, (err, val) => {
+            console.log("lambda() param=" + param + " val=" + val);
+            addWord(options, param, {
+              name: param,
+              val: val,
+            });
+          });
+        }
+      });
+      visit(node.elts[1], options, function (err, val) {
+        // let env = topEnv(options);
+        // let lexicon = env.lexicon;
+        // Object.keys(lexicon).forEach(n => {
+        //   // Reflect local bindings into the generator object.
+        //   val[n] = String(lexicon[n].val);
+        // });
+        exitEnv(options);
+        console.log("lambda() val=" + JSON.stringify(val));
+        resume([].concat(err0).concat(err).concat(err), val)
       });
     });
   }
@@ -344,6 +368,7 @@ const transform = (function() {
         if (isNaN(val2)) {
           err2 = err2.concat(error("Argument must be a number.", node.elts[1]));
         }
+        console.log("add() val1=" + val1 + " val2=" + val2);
         resume([].concat(err1).concat(err2), val1 + val2);
       });
     });
