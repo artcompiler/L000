@@ -193,16 +193,12 @@ const transform = (function() {
   }
   function lambda(node, options, resume) {
     // Return a function value.
-    console.log("lambda() nodePool=" + JSON.stringify(nodePool, null, 2));
-    console.log("lambda() node=" + JSON.stringify(node, null, 2));
     visit(node.elts[0], options, function (err0, params) {
       let args = [].concat(options.args);
-      console.log("lambda() args=" + JSON.stringify(args));
       enterEnv(options, "lambda", params.length);
       params.forEach(function (param, i) {
         let inits = nodePool[node.elts[3]].elts;
         if (args[i]) {
-          console.log("lambda() param=" + param + " val=" + args[i]);
           // Got an arg so use it.
           addWord(options, param, {
             name: param,
@@ -211,7 +207,6 @@ const transform = (function() {
         } else {
           // Don't got an arg so use the init.
           visit(inits[i], options, (err, val) => {
-            console.log("lambda() param=" + param + " val=" + val);
             addWord(options, param, {
               name: param,
               val: val,
@@ -220,14 +215,7 @@ const transform = (function() {
         }
       });
       visit(node.elts[1], options, function (err, val) {
-        // let env = topEnv(options);
-        // let lexicon = env.lexicon;
-        // Object.keys(lexicon).forEach(n => {
-        //   // Reflect local bindings into the generator object.
-        //   val[n] = String(lexicon[n].val);
-        // });
         exitEnv(options);
-        console.log("lambda() val=" + JSON.stringify(val));
         resume([].concat(err0).concat(err).concat(err), val)
       });
     });
@@ -368,7 +356,6 @@ const transform = (function() {
         if (isNaN(val2)) {
           err2 = err2.concat(error("Argument must be a number.", node.elts[1]));
         }
-        console.log("add() val1=" + val1 + " val2=" + val2);
         resume([].concat(err1).concat(err2), val1 + val2);
       });
     });
