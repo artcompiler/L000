@@ -6,6 +6,7 @@ window.gcexports.globalLexicon = {
     "concat" : { "tk": 1, "name": "CONCAT", "cls": "function", "length": 1 , "arity": 1 },
     "add" : { "tk": 1, "name": "ADD", "cls": "function", "length": 2 , "arity": 2 },
     "mul" : { "tk": 1, "name": "MUL", "cls": "function", "length": 2 , "arity": 2 },
+    "pow" : { "tk": 1, "name": "POW", "cls": "function", "length": 2 , "arity": 2 },
     "style" : { "tk": 1, "name": "STYLE", "cls": "function", "length": 2, "arity": 2 },
     "map" : { "tk": 1, "name": "MAP", "cls": "function", "length": 2, "arity": 2 },
     "apply" : { "tk": 1, "name": "APPLY", "cls": "function", "length": 2, "arity": 2 },

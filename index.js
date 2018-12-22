@@ -62,6 +62,25 @@ app.get("/compile", function(req, res) {
     res.send(e);
   });
 });
+function test() {
+  // -- Get ASTs and OBJs for this language.
+  // -- Compile each AST and compare OBJ to existing OBJ.
+  //
+  let code = body.src;
+  let data = body.data;
+  data.REFRESH = body.refresh; // Stowaway flag.
+  let t0 = new Date;
+  let obj = compiler.compile(code, data, function (err, val) {
+    if (err.length) {
+      res.send({
+        error: err,
+      });
+    } else {
+      console.log("GET /compile " + (new Date - t0) + "ms");
+      res.json(val);
+    }
+  });
+}
 function postAuth(path, data, resume) {
   let encodedData = JSON.stringify(data);
   var options = {
@@ -116,7 +135,6 @@ function validate(token, resume) {
   } else {
     postAuth("/validate", {
       jwt: token,
-      lang: "L" + langID,
     }, (err, data) => {
       validated[token] = data;
       resume(err, data);
